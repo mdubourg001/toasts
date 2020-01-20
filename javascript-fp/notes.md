@@ -1,6 +1,6 @@
-# La programmation fonctionnelle en JavaScript
+# La programmation fonctionnelle dans l'écosystème JavaScript
 
-Cet article tentera de rappeler les principes et les avantages du paradigme fonctionnel puis apportera des éléments d'application de ce dernier à l'écosystème JavaScript. 
+Cet article tentera de rappeler les principes et les avantages du paradigme fonctionnel puis apportera des éléments d'application de ce dernier à l'écosystème JavaScript.
 
 Sauf indication contraire, **tout les exemples de code présenté seront rédigés en TypeScript.**
 
@@ -10,15 +10,13 @@ Le paradigme fonctionnel est un paradigme de programmation de type **déclaratif
 
 En programmation fonctionnelle, ces composants sont des **fonctions mathématiques**.
 
-
 ### I.1 - Les principes de la programmation fonctionnelle
 
 La programmation fonctionnelle impose certaines règles:
 
 - _Separation Of Concerns_: **les données et leurs structures doivent être séparées de la logique**. Une classe (ou un _type_ comme on préferera les utiliser en PF) ne doit donc servir uniquement qu'à la représentation d'une donnée. Les traitements réalisés sur de telles données sont réservés à des fonctions pures. En suivant la même logique, **une fonction doit être responsable d'une et une seule tâche**.
-- _Pureté_: **une fonction doit, si possible, être pure**: Pour des arguments donnés, une fonction pure doit toujours retourner la même valeur. Elle doit donc être déterministe et ne doit pas elle même utiliser des fonctions impures (appels API, I/O, aléatoire, sides-effects en général...). 
+- _Pureté_: **une fonction doit, si possible, être pure**: Pour des arguments donnés, une fonction pure doit toujours retourner la même valeur. Elle doit donc être déterministe et ne doit pas elle même utiliser des fonctions impures (appels API, I/O, aléatoire, sides-effects en général...).
 - _Immutabilité_: **une donnée ne doit pas être réassignée**. Une fonction ne doit donc en aucun cas muter un argument qui lui a été passé en paramètre. Quand c'est nécessaire, une telle fonction doit plutôt créer une nouvelle copie modifiée de cette donnée, ou utiliser la récursivité.
-
 
 Et utilise certains principes:
 
@@ -45,12 +43,13 @@ Du fait que la programmation fonctionnelle soit assez stricte et peu permissive,
 
 Malgrès ce qui peut être dicté par le paradigme fonctionnel, les programmes informatiques **ont besoin** de side effects, sans quoi leurs utilisations seraient très limitées. Il existe cependant des moyens de réduire la dépendance forte qui existe entre un programme et ses side effects, et de maintenir au maximum la pureté des fonctions qui le composent.
 
-#### _Exemple: OpenWeather2TextFile_ 
+#### _Exemple: OpenWeather2TextFile_
 
 **Admettons par exemple** que nous souhaitons écrire un programme génialement baptisé _OpenWeather2TextFile_ permettant de récupérer la température actuelle à Bordeaux via les services de OpenWeather, de convertir celle-ci en degrés Celsius, de multiplier la valeur obtenue par un nombre aléatoire, et enfin d'écrire cette toute dernière valeur dans un fichier texte présent sur notre disque.
 
 On peut dors et déjà distinguer les opérations _pures_ des opérations dîtes _impures_:
-- récupération de la température actuelle: implique un appel (asynchrone 😱) à une API externe et est donc **impure**
+
+- récupération de la température actuelle: implique un appel (asynchrone) à une API externe et est donc **impure**
 - conversion en degrés Celsius: aucun effet de bord et donc **pure**
 - multiplier la valeur obtenue par un nombre aléatoire: implique l'utilisation d'un générateur de nombres aléatoires, et est donc **impure**
 - écrire cette toute dernière valeur dans un fichier: **impure**
@@ -94,9 +93,9 @@ return compose(
 )();
 ```
 
-Grâce au découpage et à l'isolation effectués, les fonctions pures (comme `convertFahrenheitToCelcius`) peuvent être facilement testées car utilisables unitairement et indépendemment des fonctions impures. 
+Grâce au découpage et à l'isolation effectués, les fonctions pures (comme `convertFahrenheitToCelcius`) peuvent être facilement testées car utilisables unitairement et indépendemment des fonctions impures.
 
-De plus, en utilisant le principe de _Fonctions d'Ordre Supérieur_ ou _Higher-order Functions (HOC)_ évoqué précedemment, **une autre fonction, impure, peut être rendue testable tout en conservant son utilisation d'un side effect: `multiplyByRandom`. Il suffit pour celà de lui permettre d'accepter un deuxième paramètre optionnel qui serait la fonction de génération aléatoire qu'elle utilise**: 
+De plus, en utilisant le principe de _Fonctions d'Ordre Supérieur_ ou _Higher-order Functions (HOC)_ évoqué précedemment, **une autre fonction, impure, peut être rendue testable tout en conservant son utilisation d'un side effect: `multiplyByRandom`. Il suffit pour celà de lui permettre d'accepter un deuxième paramètre optionnel qui serait la fonction de génération aléatoire qu'elle utilise**:
 
 ```typescript
 const multiplyByRandom = (
@@ -107,11 +106,116 @@ const multiplyByRandom = (
 
 ```typescript
 // tests.ts
-test('multiplyByRandom', () => {
+
+test("multiplyByRandom", () => {
   expect(multiplyByRandom(20, () => 0.5)).toBe(10);
 });
 ```
 
-Remarque: une modification similaire pourrait être effectuée sur la fonction `fetchBordeauxTemperatureFromOW` en lui permettant d'accepter un deuxième paramètre qui serait la fonction utilisée afin de récupérer les données de températures. Celà permettrai la aussi de rendre cette fonction testable en mockant l'appel HTTP.
+Remarque: une modification similaire pourrait être effectuée sur la fonction `fetchBordeauxTemperatureFromOW` en lui permettant d'accepter un deuxième paramètre qui serait la fonction utilisée afin de récupérer les données de températures. Celà permettrai là aussi de rendre cette fonction testable en mockant l'appel HTTP.
 
-> ℹ️ - Certains langages fonctionnels typés, comme Haskell, sont intransigeants avec les side effects, et proposent donc des structures spécifiques appelées **monades** afin d'en permettre l'utilisation. Cependant, les monades sont un principe assez vaste et mathématiquement complexe que nous ne traiteront pas ici.
+> ℹ️ - Certains langages fonctionnels typés, comme Haskell, sont intransigeants avec les side effects, et proposent donc des structures spécifiques appelées **monades** afin d'en permettre l'utilisation. Cependant, les monades sont un principe assez vaste et complexe mathématiquement que nous ne traiterons pas ici.
+
+---
+
+## II - Application à JavaScript
+
+JavaScript est un langage multi-paradigmes, faiblement et dynamiquement typé, majoritairement utilisé dans la création de sites et d'applications web. De par son utilisation principale au travers de navigateurs web, c'est un langage très fortement lié aux effets de bords (manipulation de DOM, appels HTTP, tâches asynchrones...). Cependant, malgrès qu'il soit très permissif et très peu strict comparé aux langages de paradigme fonctionnels classiques, **JavaScript est un langage fonctionnel**. Un certain nombres d'outils et de règles peuvent être mises en place autour de celui-ci afin de suivre au mieux les principes de programmation fonctionnelle.
+
+⚠️ - Il est important de rappeller qu'il peut être **compliqué et innutilement couteux d'essayer de faire en sorte que votre code suive à 100% le paradigme fonctionnel.** La programmation fonctionnelle peut s'avérer très utile dans le cadre du développement d'algorithmes nécessitant peu d'effets de bords, **mais peut ne pas être indispensable dans d'autres cas: elle n'est donc pas à utiliser aveuglément.**
+
+> ℹ️ - Certains langages comme ReasonML ou ELM proposent une syntaxe similaire à celle de langage fonctionnels classiques (comme OCaml ou Haskell) et visent à être compilés en JavaScript. Nous n'aborderons pas ces solutions ici.
+
+### II.1 - Quelques principes et règles
+
+#### _Éviter les assignations et les mutations_
+
+Afin d'éviter l'utilisation inutile de contexte interne aux fonctions, si c'est possible, les assignations de variables doivent être évitées. Si au cours du développement d'une fonction il vous apparait qu'une assignation intermédiaire de variable est nécessaire, **étudiez plutôt la possibilité de découper votre fonction en plusieurs fonctions indépendantes plus petites** ou bien .
+
+Prenons l'exemple trivial d'une fonction qui calcule une moyenne pour un tableau de notes (sur une échelle de 20) donné, et renvoie cette moyenne rapportée à une échelle de 10:
+
+```typescript
+const averageMarkOutOfTen = (marks: Array<number>): number => {
+  const avg = marks.reduce((acc, cur) => acc + cur, 0) / marks.length;
+  return avg / 2;
+};
+```
+
+> ℹ️ - On peut noter l'utilisation de Array.reduce au lieu d'une boucle for, ce qui évite déjà une assignation inutile.
+
+Ici, la variable intérmédiaire `avg` peut être éludée de différentes manières:
+
+- soit en réduisant à une seule ligne la totalité des opérations (_ce qui rendrait le code peu lisible et difficilement réutilisable_):
+
+```typescript
+const averageMarkOutOfTen = (marks: Array<number>): number => {
+  return marks.reduce((acc, cur) => acc + cur, 0) / marks.length / 2;
+};
+```
+
+- soit en découpant cette fonction en deux fonctions distinctes (_l'une qui calcule la moyenne, l'autre qui rapporte cette moyenne sur une échelle donnée_):
+
+```typescript
+// fonction de calcul de moyenne
+const average = (array: Array<number>): number =>
+  array.reduce((acc, cur) => acc + cur, 0) / array.length;
+
+// fonction de produit en croix
+const ratio = (n: number, actualScale: number, targetScale: number): number =>
+  (n * targetScale) / actualScale;
+
+const averageMarkOutOfTen = (marks: Array<number>): number =>
+  ratio(average(marks));
+```
+
+Grâce à cette dernière solution, aucune variable intermédiaire n'est nécessaire, le code est devenu plus facilement testable unitairement, et surtout **plus facilement réutilisable**, comme nous le verrons par la suite, grâce au _Currying_.
+
+Afin de limiter la possibilité de créer des mutations, **l'utilisation du mot clé `const` peut s'avérer très efficace**, même dans la création de fonctions, où la notation 'fat arrow' peut être priviliégiée par rapport au mot clé `function`.
+
+#### _Privilégier la composition (ou le pipelining), l'unarité, et le chaining_
+
+Afin de préserver l'immutabilité et de limiter l'utilisation de variables intermédiaires, un bon principe et **d'utiliser la composition de fonction ou le pipelining** (qui est le même principe, utilisé dans le sens inverse). Ce principe reviens à faire implicitement passer le résultat d'appel à une fonction directement dans la fonction suivante, sans utiliser de variable de stockage intermédiaire:
+
+Ainsi, si je veux écrire un programme permettant de vérifier que la racine carrée du double d'un chiffre donné est paire, au lieu d'écrire quelque chose de la sorte:
+
+```typescript
+const double = (n: number): number => n * 2;
+
+const sqrt = (n: number): number => Math.sqrt(n);
+
+const isPair = (n: number): boolean => n % 2 === 0;
+
+// cet appel est peu lisible
+return isPair(sqrt(double(8)));
+```
+
+Je peux utiliser les fonctions `_.compose` ou `_.pipe` de la libraire **lodash/fp**, qui me permettent d'effectuer cet appel comme suit:
+
+```typescript
+const { compose, pipe } = require("lodash/fp");
+
+// en utilisant _.compose, qui se lit de gauche à droite, mais est éxécuté de droite à gauche
+return compose(isPair, sqrt, double)(8);
+
+// en utilisant _.pipe, qui se lit de droite à gauche, mais est éxécuté de gauche à droite
+return pipe(double, sqrt, isPair)(8);
+```
+
+// TODO Cependant unarité -> Currying
+// TODO Chaining
+
+#### _Privilégier les fonctions d'ordre supérieur_
+
+#### _Privilégier la récursivité ou les Array functions aux boucles_
+
+### II.2 - Quelques outils
+
+#### _TypeScript_
+
+#### _ESLint - eslint-plugin-fp_
+
+#### _Lodash - lodash/fp - eslint-plugin-lodash-fp_
+
+---
+
+## Conclusion
