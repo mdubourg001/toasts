@@ -25,7 +25,7 @@ Et utilise certains principes:
 - _'Chaining' d'opérations_
 - _Composition de fonctions_
 - _Transparence Référentielle_
-- _'Currying'_
+- _Curification_
 - _Monades (😱)_
 - ...
 
@@ -37,7 +37,7 @@ Du fait que la programmation fonctionnelle soit assez stricte et peu permissive,
 - _Découpage implicite du code_: la pureté des fonctions et le principe de récursivité crée un découpage implicite du code. Celui-ci peut donc facilement être répartit, par nature, entre plusieurs fichiers
 - _Séparation of Concerns by Design_: la séparation des préoccupations est un des principes fondamentaux de conception informatique. En programmation fonctionnelle, le code est implicitement découpé et respecte donc plus facilement ce principe
 - _Réutilisabilité_: toujours pour la même raison, chaque fonction pure peut etre facilement réutilisé partout au sein d'un même programme ou même partagé entre plusieurs programmes
-- _Facilité d'abstraction_: grâce aux principes de _Transparence Référentielle_ et de _Currying_, une fonction peut facilement être étendue ou détournée sans duplication de code
+- _Facilité d'abstraction_: grâce aux principes de _Transparence Référentielle_ et de _Curification_, une fonction peut facilement être étendue ou détournée sans duplication de code
 
 ### I.3 - Gestions des side effects en programmation fonctionnelle
 
@@ -128,9 +128,11 @@ JavaScript est un langage multi-paradigmes, faiblement et dynamiquement typé, m
 
 ### II.1 - Quelques principes et règles
 
-#### _Éviter les assignations et les mutations_
+#### Limiter les assignations inutiles et éviter les mutations\_
 
 Afin d'éviter l'utilisation inutile de contexte interne aux fonctions, si c'est possible, les assignations de variables doivent être évitées. Si au cours du développement d'une fonction il vous apparait qu'une assignation intermédiaire de variable est nécessaire, **étudiez plutôt la possibilité de découper votre fonction en plusieurs fonctions indépendantes plus petites** ou bien .
+
+> ℹ️ - **Bien sur, certains algorithmes nécessitent des variables intermédiaires, c'est inévitable**. Dans de tels cas, il faut essayer de limiter au maximum la portée (le _scope_) de telles variables. Une assignation ou une mutation locale au scope d'une fonction n'impacte pas sa réutilisabilité ou sa testabilité.
 
 Prenons l'exemple trivial d'une fonction qui calcule une moyenne pour un tableau de notes (sur une échelle de 20) donné, et renvoie cette moyenne rapportée à une échelle de 10:
 
@@ -168,15 +170,15 @@ const averageMarkOutOfTen = (marks: Array<number>): number =>
   ratio(average(marks));
 ```
 
-Grâce à cette dernière solution, aucune variable intermédiaire n'est nécessaire, le code est devenu plus facilement testable unitairement, et surtout **plus facilement réutilisable**, comme nous le verrons par la suite, grâce au _Currying_.
+Grâce à cette dernière solution, aucune variable intermédiaire n'est nécessaire, le code est devenu plus facilement testable unitairement, et surtout **plus facilement réutilisable**, comme nous le verrons par la suite, grâce à la _Curification_.
 
 Afin de limiter la possibilité de créer des mutations, **l'utilisation du mot clé `const` peut s'avérer très efficace**, même dans la création de fonctions, où la notation 'fat arrow' peut être priviliégiée par rapport au mot clé `function`.
 
-#### _Privilégier la composition (ou le pipelining), l'unarité, et le chaining_
+#### _Privilégier la composition (ou le pipelining) et l'unarité_
 
 Afin de préserver l'immutabilité et de limiter l'utilisation de variables intermédiaires, un bon principe et **d'utiliser la composition de fonction ou le pipelining** (qui est le même principe, utilisé dans le sens inverse). Ce principe reviens à faire implicitement passer le résultat d'appel à une fonction directement dans la fonction suivante, sans utiliser de variable de stockage intermédiaire:
 
-Ainsi, si je veux écrire un programme permettant de vérifier que la racine carrée du double d'un chiffre donné est paire, au lieu d'écrire quelque chose de la sorte:
+Ainsi, si on souhaite écrire un programme permettant de vérifier que la racine carrée du double d'un chiffre donné est paire, au lieu d'écrire quelque chose de la sorte:
 
 ```typescript
 const double = (n: number): number => n * 2;
@@ -189,7 +191,7 @@ const isPair = (n: number): boolean => n % 2 === 0;
 return isPair(sqrt(double(8)));
 ```
 
-Je peux utiliser les fonctions `_.compose` ou `_.pipe` de la libraire **lodash/fp**, qui me permettent d'effectuer cet appel comme suit:
+On pourrait utiliser les fonctions `_.compose` ou `_.pipe` de la libraire **lodash/fp**, qui me permettent d'effectuer cet appel comme suit:
 
 ```typescript
 const { compose, pipe } = require("lodash/fp");
@@ -201,10 +203,42 @@ return compose(isPair, sqrt, double)(8);
 return pipe(double, sqrt, isPair)(8);
 ```
 
-// TODO Cependant unarité -> Currying
-// TODO Chaining
+Cependant, une fonction ne retournant qu'une seule et unique valeur, la composition ou le pipelining ne peuvent être utilisés que sur des fonctions **unaires**. Ainsi, afin de pouvoir effectuer des compositions de fonctions le plus possible, **il convient d'essayer de maintenir au maximum une faible arité sur nos fonctions**.
 
-#### _Privilégier les fonctions d'ordre supérieur_
+Néanmoint, certaines fonctions sont inévitablement d'arité supérieure à 1. La programmation fonctionnelle propose plusieurs outils afin de pouvoir réutiliser de telles fonctions et de pouvoir les utiliser dans des contextes ou l'unarité est nécessaire. Ces outils sont la **Curification** et l'**Application partielle**.
+
+**Si on reprends l'exemple de calcul et de rapport de moyenne vu précedemment**, la fonction `ratio`, non unaire, peut bénéficier de ces outils:
+
+Avec la **Currification**:
+
+```typescript
+const _ = require("lodash/fp");
+
+// fonction non unaire de calcul de produit en croix (voir calcul de moyenne précedemment)
+const ratio = (n: number, actualScale: number, targetScale: number): number =>
+  (n * targetScale) / actualScale;
+
+// fonction unaire permettant de rapporter une la note de 15/20 sur une échelle différente
+// (l'utilité de cette fonction est discutable, mais permet de démontrer l'intêret de la Curryfication)
+const ratioOf15OutOf20 = _.curry(ratio)(15, 20);
+
+// la note de 15/20 sur une échelle 30, puis sur une échelle 42
+return ratioOf15OutOf20(30); // --> 22.5
+return ratioOf15OutOf20(42); // --> 31.5
+```
+
+Avec l'**Application partielle** (`_` se comporte ici comme un 'placeholder'):
+
+```typescript
+// fonction unaire permettant de rapporter n'importe quelle note sur 20, sur 10
+const ratioOutOf20ToOutOf10 = _.partial(ratio, _, 20, 10);
+
+// les notes de 13/20 et de 17.5/20 rapportées sur 10
+return ratioOutOf20ToOutOf10(13); // --> 6.5
+return ratioOutOf20ToOutOf10(17.5); // --> 8.75
+```
+
+> ℹ️ - `curry` et `partial` utilisent le principe de **thunk**, qui permet d'encapsuler une expression afin d'en retarder l'évaluation: ici en encapsulant la fonction qui leur est donnée ainsi que certains de ses paramètres.
 
 #### _Privilégier la récursivité ou les Array functions aux boucles_
 
@@ -215,6 +249,8 @@ return pipe(double, sqrt, isPair)(8);
 #### _ESLint - eslint-plugin-fp_
 
 #### _Lodash - lodash/fp - eslint-plugin-lodash-fp_
+
+### II.3 - Cohabitation avec la programmation évenementielle
 
 ---
 
