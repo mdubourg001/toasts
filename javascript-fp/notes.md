@@ -39,7 +39,7 @@ Du fait que la programmation fonctionnelle soit assez stricte et peu permissive,
 - _Séparation of Concerns by Design_: la séparation des préoccupations est un des principes fondamentaux de conception informatique. En programmation fonctionnelle, le code est implicitement découpé et respecte donc ce principe
 - _Facilité d'abstraction_: grâce aux principes de _Transparence Référentielle_, de _Curification_ et d'_Application partielle_, une fonction peut facilement être étendue ou détournée sans duplication de code
 
-### I.3 - Gestions des side effects en programmation fonctionnelle
+### I.3 - Gestions des effets de bord en programmation fonctionnelle
 
 Malgrès ce qui peut être dicté par le paradigme fonctionnel, les programmes informatiques **ont besoin** d'utiliser des effets de bord, sans quoi leurs utilisations seraient très limitées. Il existe cependant des moyens de réduire la dépendance forte qui existe entre un programme et ses effets de bord, et de maintenir au maximum la pureté des fonctions qui le composent.
 
@@ -54,7 +54,7 @@ On peut dors et déjà distinguer les opérations _pures_ des opérations dîtes
 - multiplier la valeur obtenue par un nombre aléatoire: implique l'utilisation d'un générateur de nombres aléatoires, et est donc **impure**
 - écrire cette toute dernière valeur dans un fichier: **impure**
 
-Étant donné la faible complexité de notre programme, on pourrait être tentés d'écrire une seule et même fonction afin de réaliser ces 4 tâches. Cependant, **cette fonction produisant des side effects serait par définition elle même impure**, et deviendrais ainsi difficile à tester, et nous perdrions de plus tout l'intêret de la programmation fonctionelle.
+Étant donné la faible complexité de notre programme, on pourrait être tentés d'écrire une seule et même fonction afin de réaliser ces 4 tâches. Cependant, **cette fonction produisant des effets de bord serait par définition elle même impure**, et deviendrais ainsi difficile à tester, et nous perdrions de plus tout l'intêret de la programmation fonctionelle.
 
 Si l'on se résout donc au fait qu'une partie des opérations de notre programme sera innévitablement impure et que l'on tente d'appliquer les principes de la programmation fonctionnelle évoqués précedemment, **une bonne pratique serait de d'isoler les fonctions impures en découpant au maximum les opérations de notre programme en fonctions indépendantes**:
 
@@ -63,7 +63,7 @@ const fetch = require("node-fetch");
 const fs = require("fs");
 const { compose } = require("lodash/fp");
 
-/** Impure (side effect asynchrone) */
+/** Impure (effets de bord & asynchrone) */
 const fetchBordeauxTemperatureFromOW = async (): number => {
   const response = await fetch(
     "api.openweathermap.org/data/2.5/weather?q=Bordeaux"
@@ -72,7 +72,7 @@ const fetchBordeauxTemperatureFromOW = async (): number => {
   return data.main.temp;
 };
 
-/** Pure (deterministe et sans side effects) */
+/** Pure (deterministe et sans effets de bord) */
 const convertFahrenheitToCelcius = (farTemp: number): number =>
   (farTemp - 32) / 1.8;
 
@@ -95,7 +95,7 @@ return compose(
 
 Grâce au découpage et à l'isolation effectués, les fonctions pures (comme `convertFahrenheitToCelcius`) peuvent être facilement testées car utilisables unitairement et indépendemment des fonctions impures.
 
-De plus, en utilisant le principe de _Fonctions d'Ordre Supérieur_ ou _Higher-order Functions (HOC)_ évoqué précedemment, **une autre fonction, impure, peut être rendue testable tout en conservant son utilisation d'un side effect: `multiplyByRandom`. Il suffit pour celà de lui permettre d'accepter un deuxième paramètre optionnel qui serait la fonction de génération aléatoire qu'elle utilise**:
+De plus, en utilisant le principe de _Fonctions d'Ordre Supérieur_ ou _Higher-order Functions (HOC)_ évoqué précedemment, **une autre fonction, impure, peut être rendue testable tout en conservant son utilisation d'un effet de bord: `multiplyByRandom`. Il suffit pour celà de lui permettre d'accepter un deuxième paramètre optionnel qui serait la fonction de génération aléatoire qu'elle utilise**:
 
 ```typescript
 const multiplyByRandom = (
@@ -114,7 +114,7 @@ test("multiplyByRandom", () => {
 
 Remarque: une modification similaire pourrait être effectuée sur la fonction `fetchBordeauxTemperatureFromOW` en lui permettant d'accepter un deuxième paramètre qui serait la fonction utilisée afin de récupérer les données de températures. Celà permettrai là aussi de rendre cette fonction testable en mockant l'appel HTTP.
 
-> ℹ️ - Certains langages fonctionnels typés, comme Haskell, sont intransigeants avec les side effects, et proposent donc des structures spécifiques appelées **monades** afin d'en permettre l'utilisation. Cependant, les monades sont un principe assez vaste et complexe mathématiquement que nous ne traiterons pas ici.
+> ℹ️ - Certains langages fonctionnels typés, comme Haskell, sont intransigeants avec les effets de bord, et proposent donc des structures spécifiques appelées **monades** afin d'en permettre l'utilisation. Cependant, les monades sont un principe assez vaste et complexe mathématiquement que nous ne traiterons pas ici.
 
 ---
 
@@ -359,3 +359,7 @@ Il existe aussi un plugin ESLint dédié à l'utilisation de `lodash/fp`: [eslin
 ---
 
 ## Conclusion
+
+JavaScript est un langage conçu autour du web, majoritairement dans le but de répondre aux besoins de celui-ci. Bien que JavaScript et son écosystème dispose de solutions et d'outils permettant d'utiliser le paradigme fonctionnel, il reste un langage très utilisé dans le développement d'applicatifs fortement liés aux effets de bord. C'est pourquoi **il peut être difficile (voir impossible ou inutile) d'écrire la totalité d'une application destinée à être utilisée sur le web en suivant le paradigme fonctionnel**.
+
+Le paradigme fonctionnel propose des principes et des règles de développement pouvant paraître stricte ou trop contraignantes au premier abord, mais dont les avantages peuvent s'avérer non négligeable dans la qualité et dans la prospérité d'une application. **Ce type de programmation n'est donc pas à utiliser sans réfléchir et dans toutes les situations en JavaScript, mais essayer d'appliquer ses principes dès que possible pourra s'avérer extremement bénéfique.**
