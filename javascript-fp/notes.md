@@ -339,6 +339,22 @@ module.exports = {
 
 #### _Lodash - lodash/fp - eslint-plugin-lodash-fp_
 
+**Lodash** est une librairie JavaScript qui fourni un grand nombre de fonctions utilitaires importables et réutilisable. **Elle fourni aussi un module [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide)** qui embarque une version de Lodash dont les méthodes appliquent les principes propres à la programmation fonctionnelle, et aident à les respecter.
+
+> ℹ️ - Certaines de ces méthodes, comme `compose`, `pipe`, `curry` ou `partial`, ont été utilisées et expliquées dans les exemples de code précédent.
+
+`lodash/fp` peut être installé via `yarn`, et importé / utilisé comme suit:
+
+```typescript
+// using require notation
+const _ = require("lodash/fp");
+
+// or using CommonJS / JS Modules
+import _ from "lodash/fp";
+```
+
+Il existe aussi un plugin ESLint dédié à l'utilisation de `lodash/fp`, ce plugin s'appelle [eslint-plugin-lodash-fp](https://github.com/jfmengels/eslint-plugin-lodash-fp).
+
 ### II.3 - Cohabitation avec la programmation évenementielle
 
 ---
