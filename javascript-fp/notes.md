@@ -12,13 +12,13 @@ En programmation fonctionnelle, ces composants sont des **fonctions mathématiqu
 
 ### I.1 - Les principes de la programmation fonctionnelle
 
-La programmation fonctionnelle impose certaines règles:
+La programmation fonctionnelle repose sur certaines règles:
 
-- _Separation Of Concerns_: **les données et leurs structures doivent être séparées de la logique**. Une classe (ou un _type_ comme on préferera les utiliser en PF) ne doit donc servir uniquement qu'à la représentation d'une donnée. Les traitements réalisés sur de telles données sont réservés à des fonctions pures. En suivant la même logique, **une fonction doit être responsable d'une et une seule tâche**.
-- _Pureté_: **une fonction doit, si possible, être pure**: Pour des arguments donnés, une fonction pure doit toujours retourner la même valeur. Elle doit donc être déterministe et ne doit pas elle même utiliser des fonctions impures (appels API, I/O, aléatoire, sides-effects en général...).
-- _Immutabilité_: **une donnée ne doit pas être réassignée**. Une fonction ne doit donc en aucun cas muter un argument qui lui a été passé en paramètre. Quand c'est nécessaire, une telle fonction doit plutôt créer une nouvelle copie modifiée de cette donnée.
+- _Separation Of Concerns_: **les données et leurs structures doivent être séparées de la logique**. Une classe (ou un _type_ comme on préferera les utiliser en programmation fonctionnelle) ne doit servir uniquement qu'à la représentation d'une donnée. Les traitements réalisés sur de telles données sont réservés à des fonctions pures. En suivant la même logique, **une fonction doit être responsable d'une et une seule tâche**.
+- _Pureté_: **une fonction doit être pure**: on dit qu'une fonction est pure si cette dernière est déterministe (sa valeur de retour sera toujours la même pour des mêmes arguments), et ne fait appel à aucun effet de bord (appels API, I/O, aléatoire, manipulation de DOM...). En toute logique, une telle fonction ne doit pas elle même utiliser des fonctions impures.
+- _Immutabilité_: **une donnée ne doit pas être réassignée**. Une fonction ne doit donc en aucun cas effectuer de mutation un argument qui lui a été passé en paramètre. Quand c'est nécessaire, une telle fonction doit plutôt créer une nouvelle copie modifiée de cette donnée, ou utiliser la récursivité. Certains langages fonctionnels, dits **fonctionnels impurs**, autorisent les mutations locales au scope des fonctions.
 
-Et utilise certains principes:
+La programmation fonctionnelle introduit et utilise aussi un certain nombres de principes et de design patterns (liste non exhaustive):
 
 - _Fonctions d'Ordre Supérieur (HOC)_
 - _Récursivité_
@@ -33,15 +33,15 @@ Et utilise certains principes:
 
 Du fait que la programmation fonctionnelle soit assez stricte et peu permissive, il découle un certain nombre de bienfaits pour celui qui l'utilise et pour le code qu'il produit:
 
-- _Testabilité_: les fonctions étant pures ou leur side effects pouvant être mockés, elles sont facilement testables unitairement et fonctionnellement
-- _Découpage implicite du code_: la pureté des fonctions et le principe de récursivité crée un découpage implicite du code. Celui-ci peut donc facilement être répartit entre plusieurs fichiers
+- _Testabilité_: les fonctions étant pures, elles sont facilement testables unitairement et fonctionnellement
+- _Découpage implicite du code_: la pureté des fonctions et les principe de récursivité, de currification et de transparence réferentielle (_et caetera_) crée un découpage implicite du code. Celui-ci peut donc facilement être répartit entre plusieurs fichiers
+- _Réutilisabilité_: chaque fonction pure peut être facilement réutilisée partout au sein d'un même programme ou même partagé entre plusieurs programmes
 - _Séparation of Concerns by Design_: la séparation des préoccupations est un des principes fondamentaux de conception informatique. En programmation fonctionnelle, le code est implicitement découpé et respecte donc ce principe
-- _Réutilisabilité_: toujours pour la même raison, chaque fonction pure peut être facilement réutilisée partout au sein d'un même programme ou même partagé entre plusieurs programmes
 - _Facilité d'abstraction_: grâce aux principes de _Transparence Référentielle_, de _Curification_ et d'_Application partielle_, une fonction peut facilement être étendue ou détournée sans duplication de code
 
 ### I.3 - Gestions des side effects en programmation fonctionnelle
 
-Malgrès ce qui peut être dicté par le paradigme fonctionnel, les programmes informatiques **ont besoin** de side effects, sans quoi leurs utilisations seraient très limitées. Il existe cependant des moyens de réduire la dépendance forte qui existe entre un programme et ses side effects, et de maintenir au maximum la pureté des fonctions qui le composent.
+Malgrès ce qui peut être dicté par le paradigme fonctionnel, les programmes informatiques **ont besoin** d'utiliser des effets de bord, sans quoi leurs utilisations seraient très limitées. Il existe cependant des moyens de réduire la dépendance forte qui existe entre un programme et ses effets de bord, et de maintenir au maximum la pureté des fonctions qui le composent.
 
 #### _Exemple: OpenWeather2TextFile_
 
@@ -120,17 +120,17 @@ Remarque: une modification similaire pourrait être effectuée sur la fonction `
 
 ## II - Application à JavaScript
 
-JavaScript est un langage multi-paradigmes, faiblement et dynamiquement typé, majoritairement utilisé dans la création de sites et d'applications web. De par son utilisation principale au travers de navigateurs web, c'est un langage très fortement lié aux effets de bords (manipulation de DOM, appels HTTP, tâches asynchrones...). Cependant, malgrès qu'il soit très permissif et très peu strict comparé aux langages de paradigme fonctionnels classiques, **JavaScript EST un langage fonctionnel**. Un certain nombres d'outils et de règles peuvent être mises en place autour de celui-ci afin de suivre au mieux les principes de programmation fonctionnelle.
+JavaScript est un langage multi-paradigmes, faiblement et dynamiquement typé, majoritairement utilisé dans la création de sites et d'applications web. De par son utilisation principale au travers de navigateurs web, c'est un langage très fortement lié aux effets de bords (manipulation de DOM, appels HTTP, tâches asynchrones...). Cependant, malgrès qu'il soit très permissif et très peu strict comparé aux langages de paradigme fonctionnels classiques, **JavaScript EST, entre autres choses, un langage fonctionnel**. Un certain nombres d'outils et de règles peuvent être mises en place autour de celui-ci afin de suivre au mieux les principes de programmation fonctionnelle.
 
-⚠️ - Il est important de rappeller qu'il peut être **compliqué et innutilement couteux d'essayer de faire en sorte que votre code suive à 100% le paradigme fonctionnel.** La programmation fonctionnelle peut s'avérer très utile dans le cadre du développement d'algorithmes nécessitant peu d'effets de bords, **mais peut ne pas être indispensable dans d'autres cas: elle n'est donc pas à utiliser aveuglément.**
+⚠️ - Il est important de rappeller qu'il peut être **compliqué et innutilement coûteux d'essayer de faire en sorte que votre code suive sans concessions le paradigme fonctionnel.** La programmation fonctionnelle peut s'avérer très utile dans le cadre du développement d'algorithmes nécessitant peu d'effets de bords, **mais peut ne pas être indispensable dans d'autres cas: elle n'est donc pas à utiliser aveuglément.**
 
-> ℹ️ - Certains langages comme ReasonML ou ELM proposent une syntaxe similaire à celle de langage fonctionnels classiques (comme OCaml ou Haskell) et visent à être compilés en JavaScript. Nous n'aborderons pas ces solutions ici.
+> ℹ️ - Certains langages comme ReasonML ou ELM proposent une syntaxe similaire à celles de langages fonctionnels classiques (comme OCaml ou Haskell) et visent à être compilés en JavaScript. Nous n'aborderons pas ces solutions ici.
 
 ### II.1 - Quelques principes et règles
 
 #### _Limiter les assignations inutiles et éviter les mutations_
 
-Afin d'éviter l'utilisation inutile de contexte interne aux fonctions, si c'est possible, les assignations de variables doivent être évitées. Si au cours du développement d'une fonction il vous apparait qu'une assignation intermédiaire de variable est nécessaire, **étudiez plutôt la possibilité de découper votre fonction en plusieurs fonctions indépendantes plus petites**.
+Afin d'éviter l'utilisation inutile de contexte interne aux fonctions, si c'est possible, les assignations de variables doivent être évitées. Si au cours du développement d'une fonction il vous apparait qu'une assignation intermédiaire de variable est nécessaire, **étudiez plutôt la possibilité de découper votre fonction en plusieurs fonctions indépendantes, et plus petites**.
 
 > ℹ️ - **Bien sur, certains algorithmes nécessitent des variables intermédiaires, c'est inévitable**. Dans de tels cas, il faut essayer de limiter au maximum la portée (le _scope_) de telles variables. Une assignation ou une mutation locale au scope d'une fonction n'impacte pas sa réutilisabilité ou sa testabilité.
 
@@ -139,19 +139,19 @@ Prenons l'exemple trivial d'une fonction qui calcule une moyenne pour un tableau
 ```typescript
 const averageMarkOutOfTen = (marks: Array<number>): number => {
   const avg = marks.reduce((acc, cur) => acc + cur, 0) / marks.length;
-  return avg / 2;
+  return (avg * 10) / 20;
 };
 ```
 
-> ℹ️ - On peut noter l'utilisation de Array.reduce au lieu d'une boucle for, ce qui évite l'utilisation d'une boucle, et d'une assignation.
+> ℹ️ - On peut noter l'utilisation de Array.reduce, qui en plus d'éviter l'utilisation d'une boucle, évite une assignation.
 
-Ici, la variable intérmédiaire `avg` peut être éludée de différentes manières:
+Dans le précédent exemple, la variable intérmédiaire `avg` peut être éludée de différentes manières:
 
 - soit en réduisant à une seule ligne la totalité des opérations (_ce qui rendrait le code peu lisible et difficilement réutilisable_):
 
 ```typescript
 const averageMarkOutOfTen = (marks: Array<number>): number => {
-  return marks.reduce((acc, cur) => acc + cur, 0) / marks.length / 2;
+  return ((marks.reduce((acc, cur) => acc + cur, 0) / marks.length) * 10) / 20;
 };
 ```
 
@@ -170,15 +170,15 @@ const averageMarkOutOfTen = (marks: Array<number>): number =>
   ratio(average(marks));
 ```
 
-Grâce à cette dernière solution, aucune variable intermédiaire n'est nécessaire, le code est devenu plus facilement testable unitairement, et surtout **plus facilement réutilisable**, comme nous le verrons par la suite, grâce à la _Curification_.
+Grâce à cette dernière solution, aucune variable intermédiaire n'est nécessaire, le code est devenu plus facilement testable unitairement, et surtout **plus facilement réutilisable**, comme nous le verrons par la suite, grâce à la _Curification_ et à l'_Application partielle_.
 
-Afin de limiter la possibilité de créer des mutations, **l'utilisation du mot clé `const` peut s'avérer très efficace**, même dans la création de fonctions, où la notation 'fat arrow' peut être priviliégiée par rapport au mot clé `function`.
+Afin de limiter la possibilité de créer des mutations, **l'utilisation du mot clé `const` s'avère très efficace**, même dans la création de fonctions, où la notation 'fat arrow' peut être priviliégiée par rapport au mot clé `function`.
 
 #### _Privilégier la composition (ou le pipelining) et l'unarité_
 
-Afin de préserver l'immutabilité et de limiter l'utilisation de variables intermédiaires, un bon principe et **d'utiliser la composition de fonction ou le pipelining** (qui est le même principe, utilisé dans le sens inverse). Ce principe reviens à faire implicitement passer le résultat d'appel d'une fonction directement dans la fonction suivante, sans utiliser de variable de stockage intermédiaire:
+Dans le but de préserver l'immutabilité et de limiter l'utilisation de variables intermédiaires, un bon principe et **d'utiliser la composition de fonctions ou le pipelining** (qui est le même principe, utilisé dans le sens inverse). Ce principe reviens à faire implicitement passer le résultat d'appel d'une fonction directement dans la fonction suivante, sans utiliser de variable de stockage intermédiaire:
 
-Ainsi, si on souhaite écrire un programme permettant de vérifier que la racine carrée du double d'un chiffre donné est paire, au lieu d'écrire quelque chose de la sorte:
+Ainsi, si on souhaite écrire un programme permettant de vérifier que la racine carrée du double d'un chiffre donné est paire, au lieu d'écrire quelque chose de la sorte...
 
 ```typescript
 const double = (n: number): number => n * 2;
@@ -191,7 +191,7 @@ const isPair = (n: number): boolean => n % 2 === 0;
 return isPair(sqrt(double(8)));
 ```
 
-On pourrait utiliser les fonctions `_.compose` ou `_.pipe` de la libraire **lodash/fp**, qui me permettent d'effectuer cet appel comme suit:
+...on pourrait utiliser les fonctions `_.compose` ou `_.pipe` de la libraire **lodash/fp**, qui permettent d'effectuer l'appel de la dernière ligne comme suit:
 
 ```typescript
 const { compose, pipe } = require("lodash/fp");
@@ -203,9 +203,9 @@ return compose(isPair, sqrt, double)(8);
 return pipe(double, sqrt, isPair)(8);
 ```
 
-Cependant, une fonction ne retournant qu'une seule et unique valeur, la composition ou le pipelining ne peuvent être utilisés que sur des fonctions **unaires**. Ainsi, afin de pouvoir effectuer des compositions de fonctions le plus possible, **il convient d'essayer de maintenir au maximum une faible arité sur nos fonctions**.
+Cependant, une fonction ne retournant qu'une seule et unique valeur en JavaScript (comme dans les langages fonctionnels classiques), la composition ou le pipelining ne peuvent être utilisés que sur des fonctions **unaires** (n'acceptant qu'un unique argument). Ainsi, afin de pouvoir utiliser au mieux la composition de fonctions, **il convient d'essayer de maintenir au maximum une faible arité sur les fonctions**.
 
-Néanmoint, certaines fonctions sont inévitablement d'arité supérieure à 1. La programmation fonctionnelle propose plusieurs outils afin de pouvoir réutiliser de telles fonctions et de pouvoir les utiliser dans des contextes ou l'unarité est nécessaire. Ces outils sont la **Curification** et l'**Application partielle**.
+Néanmoins, certaines fonctions sont inévitablement d'arité supérieure à 1. La programmation fonctionnelle propose plusieurs outils afin de pouvoir réutiliser de telles fonctions et de pouvoir les utiliser dans des contextes ou l'unarité est nécessaire. Ces outils sont la **Curification** et l'**Application partielle**.
 
 **Si on reprends l'exemple de calcul et de rapport de moyenne vu précedemment**, la fonction `ratio`, non unaire, peut bénéficier de ces outils:
 
@@ -218,8 +218,8 @@ const _ = require("lodash/fp");
 const ratio = (n: number, actualScale: number, targetScale: number): number =>
   (n * targetScale) / actualScale;
 
-// fonction unaire permettant de rapporter une la note de 15/20 sur une échelle différente
-// (l'utilité de cette fonction est discutable, mais permet de démontrer l'intêret de la Curryfication)
+// fonction unaire permettant de rapporter la note de 15/20 sur une échelle différente
+// (l'utilité de cette fonction est discutable, mais permet de démontrer l'intêret de la Currification)
 const ratioOf15OutOf20 = _.curry(ratio)(15, 20);
 
 // la note 15/20 sur une échelle 30, puis sur une échelle 42
@@ -227,10 +227,10 @@ return ratioOf15OutOf20(30); // --> 22.5
 return ratioOf15OutOf20(42); // --> 31.5
 ```
 
-Avec l'**Application partielle** (`_` se comporte ici comme un 'placeholder'):
+Avec l'**Application partielle** ('`_`' se comporte ici comme un 'placeholder'):
 
 ```typescript
-// fonction unaire permettant de rapporter n'importe quelle note sur 20, sur 10
+// fonction unaire permettant de rapporter n'importe quelle note sur une échelle de 20, à la note correspondante sur une échelle de 10
 const ratioOutOf20ToOutOf10 = _.partial(ratio, _, 20, 10);
 
 // les notes 13/20 et 17.5/20 rapportées sur 10
@@ -238,11 +238,11 @@ return ratioOutOf20ToOutOf10(13); // --> 6.5
 return ratioOutOf20ToOutOf10(17.5); // --> 8.75
 ```
 
-> ℹ️ - `curry` et `partial` utilisent le principe de **[thunk](https://en.wikipedia.org/wiki/Thunk)**, qui permet d'encapsuler une expression afin d'en retarder l'évaluation: ici en encapsulant la fonction qui leur est donnée ainsi que certains de ses paramètres.
+> ℹ️ - `curry` et `partial` utilisent en interne le principe de **[thunk](https://en.wikipedia.org/wiki/Thunk)**, qui permet d'encapsuler une expression afin d'en retarder l'évaluation: ici en encapsulant la fonction qui leur est donnée ainsi que certains de ses paramètres.
 
 #### _Privilégier la récursivité ou les Array functions aux boucles_
 
-En programmation fonctionnelle, l'utilisation de boucles (`for` ou `while`) est délaissée au profit d'autres patterns. En JavaScript par exemple, un nombre important de **fonctions d'ordre supérieur** comme `map`, `filter`, `find` ou `reduce` (et d'autres) sont mises à disposition afin de permettre **la manipulation chainée de tableaux**. Ces fonctions, étant d'ordre supérieur, ont la particularité d'accepter une fonction comme paramètre et de **ne pas effectuer de mutation sur le tableau sur lequel elles sont appelées**.
+En programmation fonctionnelle, l'utilisation de boucles (`for` ou `while`) est délaissée au profit d'autres patterns. En JavaScript par exemple, un nombre important de **fonctions d'ordre supérieur** comme `map`, `filter`, `find` ou `reduce` (et d'autres) sont mises à disposition afin de permettre **la manipulation chainée de tableaux**. Ces fonctions, étant d'ordre supérieur, ont l'avantage d'accepter une fonction comme paramètre et de **ne pas effectuer de mutation sur le tableau sur lequel elles sont appelées**.
 
 Admettons que nous souhaitons écrire une fonction permettant de récupérer les adresses e-mail de tout les utilisateurs dont le compte à expiré dans une liste donnée:
 
@@ -260,6 +260,7 @@ const getExpiredUsers = (
   now: Date = new Date()
 ): Array<string> => {
   const expiredEmails = [];
+  // on aurait aussi pu utiliser la notation `for of` ici
   for (let i = 0; i < list.length; i++) {
     if (list[i].expirationDate <= now) {
       expiredEmails.push(list[i].email);
@@ -269,7 +270,7 @@ const getExpiredUsers = (
 };
 ```
 
-On peut écrire la même fonction grâce à aux Array functions (ce qui la rendra beaucoup plus lisible et éliminera toute mutation: **c'est l'implémentation qui répond le mieux à cet exemple**)...
+On peut écrire la même fonction grâce à aux Array functions (ce qui la rendra beaucoup plus lisible et éliminera toute mutation: **c'est l'implémentation à privilégier dans cet exemple**)...
 
 ```typescript
 const getExpiredUsers = (
@@ -278,7 +279,7 @@ const getExpiredUsers = (
 ): Array<string> => list.filter(u => u.expirationDate <= now).map(u => u.email);
 ```
 
-Ou grâce à la récursivité (qui élimine aussi toute mutation, et respecte le mieux les implémentations fonctionnelles habituelles, et à l'avantage d'être une habitude d'écriture qui **limite fortement l'oubli de cas particuliers**):
+Ou grâce à la récursivité (qui élimine aussi toute mutation, et respecte le mieux les implémentations fonctionnelles habituelles, tout en ayant l'avantage d'être une habitude d'écriture qui **limite fortement l'oubli de cas particuliers**):
 
 ```typescript
 const getExpiredUsers = (
@@ -315,7 +316,7 @@ yarn add @typescript-eslint/eslint-plugin @typescript-eslint/parser -D
 
 #### _ESLint - eslint-plugin-fp_
 
-L'application de toutes le srègles évoquées précedemment n'est pas forcée par JavaScript ou TypeScript nativement. **L'utilisation d'ESLint et du plugin `eslint-plugin-fp` permet de pousser au respect de celles-ci** en indiquant au sein de votre IDE toutes les opérations allant à leur encontre ([voir la liste](https://github.com/jfmengels/eslint-plugin-fp#rules)).
+L'application de toutes les règles évoquées précedemment n'est pas forcée par JavaScript ou TypeScript nativement. **L'utilisation d'ESLint et du plugin `eslint-plugin-fp` permet de forcer le développeur à respecter ces règles** en indiquant au sein de son IDE toutes les opérations allant à leur encontre ([voir la liste](https://github.com/jfmengels/eslint-plugin-fp#rules) des règles introduites par ce plugin).
 
 Installation:
 
@@ -339,7 +340,7 @@ module.exports = {
 
 #### _Lodash - lodash/fp - eslint-plugin-lodash-fp_
 
-**Lodash** est une librairie JavaScript qui fourni un grand nombre de fonctions utilitaires importables et réutilisable. **Elle fourni aussi un module [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide)** qui embarque une version de Lodash dont les méthodes appliquent les principes propres à la programmation fonctionnelle, et aident à les respecter.
+**Lodash** est une librairie JavaScript qui fourni un grand nombre de fonctions utilitaires importables et réutilisable. **Elle fourni aussi un module [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide)** qui embarque une version de Lodash dont les méthodes appliquent les principes propres à la programmation fonctionnelle, tout en aidant à les respecter.
 
 > ℹ️ - Certaines de ces méthodes, comme `compose`, `pipe`, `curry` ou `partial`, ont été utilisées et expliquées dans les exemples de code précédent.
 
@@ -353,9 +354,7 @@ const _ = require("lodash/fp");
 import _ from "lodash/fp";
 ```
 
-Il existe aussi un plugin ESLint dédié à l'utilisation de `lodash/fp`, ce plugin s'appelle [eslint-plugin-lodash-fp](https://github.com/jfmengels/eslint-plugin-lodash-fp).
-
-### II.3 - Cohabitation avec la programmation évenementielle
+Il existe aussi un plugin ESLint dédié à l'utilisation de `lodash/fp`: [eslint-plugin-lodash-fp](https://github.com/jfmengels/eslint-plugin-lodash-fp).
 
 ---
 
