@@ -238,7 +238,7 @@ return ratioOutOf20ToOutOf10(13); // --> 6.5
 return ratioOutOf20ToOutOf10(17.5); // --> 8.75
 ```
 
-> ℹ️ - `curry` et `partial` utilisent le principe de **thunk**, qui permet d'encapsuler une expression afin d'en retarder l'évaluation: ici en encapsulant la fonction qui leur est donnée ainsi que certains de ses paramètres.
+> ℹ️ - `curry` et `partial` utilisent le principe de **[thunk](https://en.wikipedia.org/wiki/Thunk)**, qui permet d'encapsuler une expression afin d'en retarder l'évaluation: ici en encapsulant la fonction qui leur est donnée ainsi que certains de ses paramètres.
 
 #### _Privilégier la récursivité ou les Array functions aux boucles_
 
@@ -301,9 +301,41 @@ const getExpiredUsers = (
 
 ### II.2 - Quelques outils
 
-#### _TypeScript_
+#### _TypeScript - @typescript-eslint_
+
+Comme je l'ai évoqué précedemment, JavaScript est un langage typé faiblement et dynamiquement, contrairement à la plupart des langages fonctionnels classiques comme Haskell ou OCaml qui sont statiquement typés. Dans l'écosystème JavaScript, **il est possible d'utiliser TypeScript**, qui permet de palier à ce manque en ajoutant (entre autres) du typage statique à JavaScript.
+
+> ℹ️ - TypeScript étant un langage destiné à être compilé en JavaScript, le typage statique qu'il introduit relève du **duck typing** (ou _[typage canard](https://fr.wikipedia.org/wiki/Duck_typing)_), qui définit le type d'un objet à partir de ses attributs et de ses méthodes.
+
+Afin de permettre l'utilisation de TypeScript avec ESLint (dont on verra les avantages par la suite), il convient d'installer les dépendances `@typescript-eslint/eslint-plugin` et `@typescript-eslint/parser`.
+
+```shell
+yarn add @typescript-eslint/eslint-plugin @typescript-eslint/parser -D
+```
 
 #### _ESLint - eslint-plugin-fp_
+
+L'application de toutes le srègles évoquées précedemment n'est pas forcée par JavaScript ou TypeScript nativement. **L'utilisation d'ESLint et du plugin `eslint-plugin-fp` permet de pousser au respect de celles-ci** en indiquant au sein de votre IDE toutes les opérations allant à leur encontre ([voir la liste](https://github.com/jfmengels/eslint-plugin-fp#rules)).
+
+Installation:
+
+```shell
+yarn add eslint eslint-plugin-fp -D
+```
+
+Configuration (avec `@typescript-eslint`):
+
+```javascript
+// .eslintrc.js, à la racine de votre projet
+
+module.exports = {
+  parser: "@typescript-eslint/parser",
+  plugins: ["@typescript-eslint", "fp"],
+  extends: ["plugin:fp/recommended"]
+};
+```
+
+> ℹ️ - À noter qu'ESLint est un linter et qu'**il n'influe donc en aucun cas sur la compilation et l'interprétation de votre code**. De plus, ses règles peuvent être facilement désactivées.
 
 #### _Lodash - lodash/fp - eslint-plugin-lodash-fp_
 
