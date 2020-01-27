@@ -43,9 +43,7 @@ Du fait que la programmation fonctionnelle soit assez stricte et peu permissive,
 
 Malgrès ce qui peut être dicté par le paradigme fonctionnel, les programmes informatiques **ont besoin** d'utiliser des effets de bord, sans quoi leurs utilisations seraient très limitées. Il existe cependant des moyens de réduire la dépendance forte qui existe entre un programme et ses effets de bord, et de maintenir au maximum la pureté des fonctions qui le composent.
 
-#### _Exemple: OpenWeather2TextFile_
-
-**Admettons par exemple** que nous souhaitons écrire un programme génialement baptisé _OpenWeather2TextFile_ permettant de récupérer la température actuelle à Bordeaux via les services de OpenWeather, de convertir celle-ci en degrés Celsius, de multiplier la valeur obtenue par un nombre aléatoire, et enfin d'écrire cette toute dernière valeur dans un fichier texte présent sur notre disque.
+**Admettons par exemple** que nous souhaitons écrire un programme permettant de récupérer la température actuelle à Bordeaux via les services de OpenWeather, de convertir celle-ci en degrés Celsius, de multiplier la valeur obtenue par un nombre aléatoire, et enfin d'écrire cette toute dernière valeur dans un fichier texte présent sur notre disque.
 
 On peut dors et déjà distinguer les opérations _pures_ des opérations dîtes _impures_:
 
@@ -128,7 +126,7 @@ JavaScript est un langage multi-paradigmes, faiblement et dynamiquement typé, m
 
 ### II.1 - Quelques principes et règles
 
-#### _Limiter les assignations inutiles et éviter les mutations_
+#### _Limiter les assignations et les mutations_
 
 Afin d'éviter l'utilisation inutile de contexte interne aux fonctions, si c'est possible, les assignations de variables doivent être évitées. Si au cours du développement d'une fonction il vous apparait qu'une assignation intermédiaire de variable est nécessaire, **étudiez plutôt la possibilité de découper votre fonction en plusieurs fonctions indépendantes, et plus petites**.
 
@@ -302,9 +300,9 @@ const getExpiredUsers = (
 
 ### II.2 - Quelques outils
 
-#### _TypeScript - @typescript-eslint_
+#### _TypeScript_
 
-Comme je l'ai évoqué précedemment, JavaScript est un langage typé faiblement et dynamiquement, contrairement à la plupart des langages fonctionnels classiques comme Haskell ou OCaml qui sont statiquement typés. Dans l'écosystème JavaScript, **il est possible d'utiliser TypeScript**, qui permet de palier à ce manque en ajoutant (entre autres) du typage statique à JavaScript.
+Comme je l'ai évoqué précedemment, JavaScript est un langage typé faiblement et dynamiquement, contrairement à la plupart des langages fonctionnels classiques comme Haskell ou OCaml qui sont statiquement typés. Dans l'écosystème JavaScript, **il est possible d'utiliser TypeScript**, qui permet de pallier ce manque en ajoutant (entre autres) du typage statique à JavaScript.
 
 > ℹ️ - TypeScript étant un langage destiné à être compilé en JavaScript, le typage statique qu'il introduit relève du **duck typing** (ou _[typage canard](https://fr.wikipedia.org/wiki/Duck_typing)_), qui définit le type d'un objet à partir de ses attributs et de ses méthodes.
 
@@ -314,7 +312,7 @@ Afin de permettre l'utilisation de TypeScript avec ESLint (dont on verra les ava
 yarn add @typescript-eslint/eslint-plugin @typescript-eslint/parser -D
 ```
 
-#### _ESLint - eslint-plugin-fp_
+#### _ESLint & eslint-plugin-fp_
 
 L'application de toutes les règles évoquées précedemment n'est pas forcée par JavaScript ou TypeScript nativement. **L'utilisation d'ESLint et du plugin `eslint-plugin-fp` permet de forcer le développeur à respecter ces règles** en indiquant au sein de son IDE toutes les opérations allant à leur encontre ([voir la liste](https://github.com/jfmengels/eslint-plugin-fp#rules) des règles introduites par ce plugin).
 
@@ -338,13 +336,49 @@ module.exports = {
 
 > ℹ️ - À noter qu'ESLint est un linter et qu'**il n'influe donc en aucun cas sur la compilation et l'interprétation de votre code**. De plus, ses règles peuvent être facilement désactivées.
 
+#### _ImmerJS / ImmutableJS_
+
+Grâce au mot clé `const`, forcer l'immutabilité en Javascript peut se faire facilement pour tout les types primitifs. Cependant, quand il s'agit de tableaux, de structure de collections comme `Map` ou `Set` , ou d'objets en général, rien ne garanti l'immutabilité au runtime (le plugin `eslint-plugin-fp` présenté précedemment permet de la limiter durant le développement).
+
+Les librairies **ImmerJS** et **ImmutableJS** permettent de pallier ce manque en mettant à disposition **des structures de données nativement immutables, et/ou des fonctions permettant de les manipuler**.
+
+- ImmerJS permet, entre autres, de contrôler l'êtat d'un objet grâce à la fonction `produce` qui accepte deux paramètres: l'êtat actuel de l'objet à modifier, et une fonction décrivant les modification a effectuer:
+
+```typescript
+import produce from "immer";
+
+const state = { foo: "bar", baz: [1, 2, 3] };
+
+// 'updatedState' est immutable par défaut
+// 'state' reste inchangé pendant et après cette opération
+const updatedState = produce(state, draft => {
+  draft.foo = "bar2";
+  draft.baz.length = 0;
+}); // { foo: "bar2", baz: [] };
+```
+
+> ℹ️ - ImmerJS permet aussi l'utilisation du principe de Curryfication en [acceptant une fonction](https://immerjs.github.io/immer/docs/curried-produce) décrivant des modifications comme premier argument de la fonction `produce`. La fonction résultante n'acceptera ainsi qu'un state comme premier argument, auquel elle appliquera la fonction de modification précedemment fournie.
+
+- ImmutableJS, elle, propose directement des structures de données immutables (`Map`, `Set`, `List`, `Stack`, `OrderedSet`, `OrderedMap` et `Record`). Dans le cas de `Map`, `Set` et `List`, les méthodes de ces structures sont assez similaires à celles des API natives de JavaScript (respectivement `Map`, `Set` et `Array`). Une des structures intéressantes de ImmutableJS est `Record`, qui est similaire à un `Object` JavaScript classique mais force l'immutabilité et permet l'utilisation de valeurs par défaut:
+
+```typescript
+const { Record } = require("immutable");
+
+const Car = Record({ wheelsCount: 4, seatsCount: 5, hasTrunk: true });
+
+// here, formulaOne.wheelsCount will be 4 by default
+const formulaOne = new Car({ seatsCount: 1, hasTrunk: false });
+```
+
+`immutable` et `immer` peuvent tout les deux être installés via `yarn`.
+
 #### _Lodash - lodash/fp - eslint-plugin-lodash-fp_
 
 **Lodash** est une librairie JavaScript qui fourni un grand nombre de fonctions utilitaires importables et réutilisable. **Elle fourni aussi un module [lodash/fp](https://github.com/lodash/lodash/wiki/FP-Guide)** qui embarque une version de Lodash dont les méthodes appliquent les principes propres à la programmation fonctionnelle, tout en aidant à les respecter.
 
 > ℹ️ - Certaines de ces méthodes, comme `compose`, `pipe`, `curry` ou `partial`, ont été utilisées et expliquées dans les exemples de code précédent.
 
-`lodash/fp` peut être installé via `yarn`, et importé / utilisé comme suit:
+`lodash` peut être installé via `yarn`, et importé / utilisé comme suit:
 
 ```typescript
 // using require notation
