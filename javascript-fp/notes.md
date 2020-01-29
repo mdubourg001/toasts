@@ -93,7 +93,7 @@ return compose(
 
 Grâce au découpage et à l'isolation effectués, les fonctions pures (comme `convertFahrenheitToCelcius`) peuvent être facilement testées car utilisables unitairement et indépendemment des fonctions impures.
 
-De plus, en utilisant le principe de _Fonctions d'Ordre Supérieur_ ou _Higher-order Functions (HOC)_ évoqué précedemment, **une autre fonction, impure, peut être rendue testable tout en conservant son utilisation d'un effet de bord: `multiplyByRandom`. Il suffit pour celà de lui permettre d'accepter un deuxième paramètre optionnel qui serait la fonction de génération aléatoire qu'elle utilise**:
+De plus, en utilisant le principe de _Fonctions d'Ordre Supérieur_ ou _Higher-order Functions (HOC)_, **une autre fonction, impure, peut être rendue testable tout en conservant son utilisation d'un effet de bord: `multiplyByRandom`. Il suffit pour celà de lui permettre d'accepter un deuxième paramètre optionnel qui serait la fonction de génération aléatoire qu'elle utilise**:
 
 ```typescript
 const multiplyByRandom = (
@@ -126,11 +126,11 @@ JavaScript est un langage multi-paradigmes, faiblement et dynamiquement typé, m
 
 ### II.1 - Quelques principes et règles
 
-#### _Limiter les assignations et les mutations_
+#### _Préférer le découpage de fonctions aux assignations_
 
-Afin d'éviter l'utilisation inutile de contexte interne aux fonctions, si c'est possible, les assignations de variables doivent être évitées. Si au cours du développement d'une fonction il vous apparait qu'une assignation intermédiaire de variable est nécessaire, **étudiez plutôt la possibilité de découper votre fonction en plusieurs fonctions indépendantes, et plus petites**.
+Afin de permettre de profiter pleinement des avantages du paradigme fonctionnel, il convient de respecter au mieux le principe de _Separation of Concerns_. Si au cours du développement d'une fonction il apparait qu'une assignation intermédiaire de variable est nécessaire, **il est préférable d'étudier plutôt la possibilité de découper cette fonction en plusieurs fonctions plus petites et indépendantes**.
 
-> ℹ️ - **Bien sur, certains algorithmes nécessitent des variables intermédiaires, c'est inévitable**. Dans de tels cas, il faut essayer de limiter au maximum la portée (le _scope_) de telles variables. Une assignation ou une mutation locale au scope d'une fonction n'impacte pas sa réutilisabilité ou sa testabilité.
+> ℹ️ - **Bien sur, certains algorithmes nécessitent des variables intermédiaires, c'est inévitable**. Dans de tels cas, il faut essayer de limiter au maximum la portée de telles variables. Une assignation ou une mutation locale au scope d'une fonction impacte peu sa réutilisabilité ou sa testabilité.
 
 Prenons l'exemple trivial d'une fonction qui calcule une moyenne pour un tableau de notes (sur une échelle de 20) donné, et renvoie cette moyenne rapportée à une échelle de 10:
 
@@ -140,8 +140,6 @@ const averageMarkOutOfTen = (marks: Array<number>): number => {
   return (avg * 10) / 20;
 };
 ```
-
-> ℹ️ - On peut noter l'utilisation de Array.reduce, qui en plus d'éviter l'utilisation d'une boucle, évite une assignation.
 
 Dans le précédent exemple, la variable intérmédiaire `avg` peut être éludée de différentes manières:
 
@@ -169,8 +167,6 @@ const averageMarkOutOfTen = (marks: Array<number>): number =>
 ```
 
 Grâce à cette dernière solution, aucune variable intermédiaire n'est nécessaire, le code est devenu plus facilement testable unitairement, et surtout **plus facilement réutilisable**, comme nous le verrons par la suite, grâce à la _Curification_ et à l'_Application partielle_.
-
-Afin de limiter la possibilité de créer des mutations, **l'utilisation du mot clé `const` s'avère très efficace**, même dans la création de fonctions, où la notation 'fat arrow' peut être priviliégiée par rapport au mot clé `function`.
 
 #### _Privilégier la composition (ou le pipelining) et l'unarité_
 
@@ -366,11 +362,11 @@ const { Record } = require("immutable");
 
 const Car = Record({ wheelsCount: 4, seatsCount: 5, hasTrunk: true });
 
-// here, formulaOne.wheelsCount will be 4 by default
+// ici, formulaOne.wheelsCount sera 4 par défaut
 const formulaOne = new Car({ seatsCount: 1, hasTrunk: false });
 ```
 
-`immutable` et `immer` peuvent tout les deux être installés via `yarn`.
+`immutable` et `immer` peuvent tout les deux être installées via `yarn`.
 
 #### _Lodash - lodash/fp - eslint-plugin-lodash-fp_
 
