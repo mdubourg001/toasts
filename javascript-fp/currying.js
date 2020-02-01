@@ -61,6 +61,6 @@ const orderYaourtsByCreationDate = curry(orderProductsOfCategoryByCreationDate)(
 );
 
 // no repetition, no filtering for each call
-orderYaourtsByCreationDate("asc");
+orderYaourtsByCreationDate();
 orderYaourtsByCreationDate("desc");
   
