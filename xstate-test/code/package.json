@@ -1,0 +1,33 @@
+{
+  "name": "xstate-test",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "author": "maxime.dubourg",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^25.1.4",
+    "@xstate/test": "^0.3.0",
+    "jest": "^25.2.1",
+    "jest-puppeteer": "^4.4.0",
+    "parcel": "^1.12.4",
+    "prettier": "^2.0.2",
+    "ts-jest": "^25.2.1",
+    "typescript": "^3.8.3",
+    "xstate": "^4.8.0"
+  },
+  "dependencies": {
+    "@xstate/react": "^0.8.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "prettier": {
+    "semi": true,
+    "tabWidth": 2,
+    "printWidth": 100,
+    "singleQuote": true,
+    "trailingComma": "all"
+  }
+}
