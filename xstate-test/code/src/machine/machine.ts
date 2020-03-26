@@ -1,5 +1,8 @@
 import { Machine, assign } from 'xstate';
 
+import { tapLog } from '../utils/devUtils';
+import translations from '../utils/translations';
+
 // ----- types -----
 
 interface IContext {
@@ -25,6 +28,27 @@ interface IEvent {
   alternatives?: string[];
 }
 
+interface IInvokeResolve extends IEvent {
+  data?: any;
+}
+
+// ----- services -----
+
+const translate = (context: IContext) =>
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const result = translations[context.source.toLowerCase()];
+
+      return result
+        ? resolve({ translation: result.translation, alternatives: result.alternatives || [] })
+        : reject('No match for text to translate.');
+    }, 1000);
+  });
+
+// ----- guards -----
+
+const isSourceFetchable = (context: IContext) => context.source.length > 0;
+
 // ----- actions -----
 
 const toggleShowAlternatives = (context: IContext) => ({
@@ -42,12 +66,14 @@ const clearFields = assign((context: IContext) => ({
 const updateSource = assign((context: IContext, { source }: IEvent) => ({
   ...context,
   source,
+  translation: '',
+  alternatives: [],
 }));
 
-const updateTranslation = assign((context: IContext, { translation, alternatives }: IEvent) => ({
+const updateTranslation = assign((context: IContext, { data }: IInvokeResolve) => ({
   ...context,
-  translation,
-  alternatives,
+  translation: data.translation,
+  alternatives: data.alternatives,
 }));
 
 const incrementTranslationsMade = assign((context: IContext) => ({
@@ -76,7 +102,10 @@ export const translatorMachine = Machine<IContext, IStateSchema, IEvent>(
     states: {
       idle: {
         on: {
-          FETCH_TRANSLATION: { target: 'fetchTranslation', actions: 'updateSource' },
+          SOURCE_CHANGE: {
+            actions: 'updateSource',
+          },
+          FETCH_TRANSLATION: [{ target: 'fetchTranslation', cond: 'isSourceFetchable' }],
           CLEAR: {
             actions: 'clearFields',
           },
@@ -85,7 +114,7 @@ export const translatorMachine = Machine<IContext, IStateSchema, IEvent>(
       fetchTranslation: {
         entry: 'incrementTranslationsMade',
         invoke: {
-          src: () => Promise.resolve(42),
+          src: 'translate',
           onDone: {
             target: 'idle',
             actions: 'updateTranslation',
@@ -110,6 +139,12 @@ export const translatorMachine = Machine<IContext, IStateSchema, IEvent>(
       updateSource,
       updateTranslation,
       incrementTranslationsMade,
+    },
+    services: {
+      translate,
+    },
+    guards: {
+      isSourceFetchable,
     },
   },
 );
