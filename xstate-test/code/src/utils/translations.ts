@@ -10,6 +10,10 @@ const translations: ITranslation = {
     translation: 'advertising',
     alternatives: ['publicity', 'advertisement'],
   },
+  rire: {
+    translation: 'laugh',
+    alternatives: ['laughter', 'laughing'],
+  },
 };
 
 export default translations;

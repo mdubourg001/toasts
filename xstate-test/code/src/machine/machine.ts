@@ -1,11 +1,10 @@
-import { Machine, assign } from 'xstate';
+import { Machine, assign, State } from 'xstate';
 
-import { tapLog } from '../utils/devUtils';
 import translations from '../utils/translations';
 
 // ----- types -----
 
-interface IContext {
+export interface IContext {
   translationsMade: number; // for testing purposes
   source: string;
   translation: string;
@@ -21,7 +20,7 @@ interface IStateSchema {
   };
 }
 
-interface IEvent {
+export interface IEvent {
   type: string;
   source?: string;
   translation?: string;
@@ -34,13 +33,13 @@ interface IInvokeResolve extends IEvent {
 
 // ----- services -----
 
-const translate = (context: IContext) =>
+const translate = async (context: IContext) =>
   new Promise((resolve, reject) => {
     setTimeout(() => {
       const result = translations[context.source.toLowerCase()];
 
       return result
-        ? resolve({ translation: result.translation, alternatives: result.alternatives || [] })
+        ? resolve({ translation: result.translation, alternatives: result.alternatives })
         : reject('No match for text to translate.');
     }, 1000);
   });
@@ -51,10 +50,10 @@ const isSourceFetchable = (context: IContext) => context.source.length > 0;
 
 // ----- actions -----
 
-const toggleShowAlternatives = (context: IContext) => ({
+const toggleShowAlternatives = assign((context: IContext) => ({
   ...context,
   showAlternatives: !context.showAlternatives,
-});
+}));
 
 const clearFields = assign((context: IContext) => ({
   ...context,
@@ -73,7 +72,7 @@ const updateSource = assign((context: IContext, { source }: IEvent) => ({
 const updateTranslation = assign((context: IContext, { data }: IInvokeResolve) => ({
   ...context,
   translation: data.translation,
-  alternatives: data.alternatives,
+  alternatives: data.alternatives || [],
 }));
 
 const incrementTranslationsMade = assign((context: IContext) => ({
@@ -97,7 +96,7 @@ export const translatorMachine = Machine<IContext, IStateSchema, IEvent>(
       source: '',
       translation: '',
       alternatives: [],
-      showAlternatives: false,
+      showAlternatives: true,
     },
     states: {
       idle: {
@@ -124,7 +123,7 @@ export const translatorMachine = Machine<IContext, IStateSchema, IEvent>(
       },
       failure: {
         on: {
-          CLOSE: {
+          CLEAR: {
             target: 'idle',
             actions: 'clearFields',
           },
