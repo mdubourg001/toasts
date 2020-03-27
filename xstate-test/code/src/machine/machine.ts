@@ -12,11 +12,25 @@ export interface IContext {
   showAlternatives: boolean;
 }
 
+export interface ITestContext {}
+
 interface IStateSchema {
   states: {
-    idle: {};
-    fetchTranslation: {};
-    failure: {};
+    idle: {
+      meta: {
+        test: (testContext: ITestContext, state: State<IContext, IEvent, any, any>) => void;
+      };
+    };
+    fetchTranslation: {
+      meta: {
+        test: (testContext: ITestContext, state: State<IContext, IEvent, any, any>) => void;
+      };
+    };
+    failure: {
+      meta: {
+        test: (testContext: ITestContext, state: State<IContext, IEvent, any, any>) => void;
+      };
+    };
   };
 }
 
@@ -109,6 +123,9 @@ export const translatorMachine = Machine<IContext, IStateSchema, IEvent>(
             actions: 'clearFields',
           },
         },
+        meta: {
+          test: () => {},
+        },
       },
       fetchTranslation: {
         entry: 'incrementTranslationsMade',
@@ -120,12 +137,34 @@ export const translatorMachine = Machine<IContext, IStateSchema, IEvent>(
           },
           onError: 'failure',
         },
+        meta: {
+          test: (_, state) => {
+            const {
+              context: { source, translation, alternatives },
+            } = state;
+
+            expect(source.length).toBeGreaterThan(0);
+            expect(translation.length).toBe(0);
+            expect(alternatives.length).toBe(0);
+          },
+        },
       },
       failure: {
         on: {
           CLEAR: {
             target: 'idle',
             actions: 'clearFields',
+          },
+        },
+        meta: {
+          test: (_, state) => {
+            const {
+              context: { source, translation, alternatives },
+            } = state;
+
+            expect(source.length).toBeGreaterThan(0);
+            expect(translation.length).toBe(0);
+            expect(alternatives.length).toBe(0);
           },
         },
       },
