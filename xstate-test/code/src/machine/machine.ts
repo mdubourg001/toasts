@@ -1,4 +1,5 @@
 import { Machine, assign, State } from 'xstate';
+import expect from 'expect';
 
 import translations from '../utils/translations';
 
@@ -12,7 +13,7 @@ export interface IContext {
   showAlternatives: boolean;
 }
 
-export interface ITestContext {}
+type ITestContext = any;
 
 interface IStateSchema {
   states: {
@@ -124,7 +125,30 @@ export const translatorMachine = Machine<IContext, IStateSchema, IEvent>(
           },
         },
         meta: {
-          test: () => {},
+          test: (_, state) => {
+            const {
+              context: { source, translation, alternatives, showAlternatives },
+            } = state;
+
+            cy.get('[data-testid="source-textarea"]').should('not.be.disabled');
+
+            if (source.length > 0) cy.get('[data-testid="source-textarea"]').should('not.be.empty');
+            else cy.get('[data-testid="source-textarea"]').should('be.empty');
+
+            if (translation.length > 0)
+              cy.get('[data-testid="translation-textarea"]').should('not.be.empty');
+            else cy.get('[data-testid="translation-textarea"]').should('be.empty');
+
+            if (alternatives.length > 0) {
+              cy.get('[data-testid="alternatives-wrapper"]').should('be.visible');
+              if (showAlternatives)
+                cy.get('[data-testid="alternatives-list"]').should('be.visible');
+              else cy.get('[data-testid="alternatives-list"]').should('not.be.visible');
+            } else {
+              cy.get('[data-testid="alternatives-wrapper"]').should('not.be.visible');
+              cy.get('[data-testid="alternatives-list"]').should('not.be.visible');
+            }
+          },
         },
       },
       fetchTranslation: {
@@ -140,12 +164,19 @@ export const translatorMachine = Machine<IContext, IStateSchema, IEvent>(
         meta: {
           test: (_, state) => {
             const {
-              context: { source, translation, alternatives },
+              context: { source, alternatives, translation, translationsMade },
             } = state;
 
             expect(source.length).toBeGreaterThan(0);
             expect(translation.length).toBe(0);
+            expect(translationsMade).toBeGreaterThan(0);
             expect(alternatives.length).toBe(0);
+
+            cy.get('[data-testid="source-textarea"]').should('be.disabled');
+            cy.get('[data-testid="source-textarea"]').should('not.be.empty');
+            cy.get('[data-testid="spinner-wrapper"]').should('be.visible');
+            cy.get('[data-testid="action-button"]').should('be.disabled');
+            cy.get('[data-testid="action-button"]').contains('Translate');
           },
         },
       },
@@ -165,6 +196,12 @@ export const translatorMachine = Machine<IContext, IStateSchema, IEvent>(
             expect(source.length).toBeGreaterThan(0);
             expect(translation.length).toBe(0);
             expect(alternatives.length).toBe(0);
+
+            cy.get('[data-testid="source-textarea"]').should('be.disabled');
+            cy.get('[data-testid="source-textarea"]').should('not.be.empty');
+            cy.get('[data-testid="error-wrapper"]').should('be.visible');
+            cy.get('[data-testid="action-button"]').should('not.be.disabled');
+            cy.get('[data-testid="action-button"]').contains('Clear');
           },
         },
       },

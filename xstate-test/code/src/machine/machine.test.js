@@ -1,8 +1,9 @@
+/// <reference types="cypress" />
 const { createModel } = require('@xstate/test');
 
 const { translatorMachine } = require('./machine');
 
-const TEST_TIMEOUT = 10_000;
+const TEST_TIMEOUT = 10000;
 const translatorModel = createModel(translatorMachine).withEvents({
   SOURCE_CHANGE: {
     cases: [{ source: 'mot' }, { source: 'azerty123' }, { source: '' }],
@@ -31,6 +32,8 @@ describe('translator machine', () => {
         it(
           path.description,
           () => {
+            cy.visit('/');
+
             path.test();
           },
           TEST_TIMEOUT,
@@ -39,7 +42,7 @@ describe('translator machine', () => {
     });
   }
 
-  it('coverage', () => {
-    translatorModel.testCoverage();
-  });
+  // it('coverage', () => {
+  //   translatorModel.testCoverage();
+  // });
 });
