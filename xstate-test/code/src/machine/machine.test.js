@@ -6,9 +6,16 @@ const { translatorMachine } = require('./machine');
 const TEST_TIMEOUT = 10000;
 const translatorModel = createModel(translatorMachine).withEvents({
   SOURCE_CHANGE: {
+    exec: (_, event) => {
+      cy.get('[data-testid="source-textarea"]').type(event.source);
+    },
     cases: [{ source: 'mot' }, { source: 'azerty123' }, { source: '' }],
   },
-  FETCH_TRANSLATION: {},
+  FETCH_TRANSLATION: {
+    exec: () => {
+      cy.get('[data-testid="action-button"]').click();
+    },
+  },
   'done.invoke.translate': {
     cases: [
       { data: { translation: 'word' } },
@@ -17,8 +24,16 @@ const translatorModel = createModel(translatorMachine).withEvents({
     ],
   },
   'error.platform.translate': {},
-  CLEAR: {},
-  TOGGLE_ALT: {},
+  CLEAR: {
+    exec: () => {
+      cy.get('[data-testid="action-button"]').click();
+    },
+  },
+  TOGGLE_ALT: {
+    exec: () => {
+      cy.get('[data-testid="alternatives-toggle-button"]').click();
+    },
+  },
 });
 
 describe('translator machine', () => {
