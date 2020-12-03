@@ -1,0 +1,7 @@
+wheel
+typing
+
+django
+djangorestframework
+django-filter
+django-cors-headers
