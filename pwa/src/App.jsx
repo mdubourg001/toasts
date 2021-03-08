@@ -34,54 +34,57 @@ export default function App() {
     }
   }, [coordinates]);
 
-  if (!coordinates) {
-    return "Loading...";
-  }
-
   return (
-    <div className="h-screen flex flex-col bg-gray-100">
+    <div className="flex flex-col h-screen bg-gray-100">
       <Header />
 
-      <section className="flex flex-col flex-1 container mx-auto p-4 text-center justify-center">
-        <h2 className="font-brand text-lg text-gray-500 mb-4">
-          THE ISS IS CURRENTLY AT
-        </h2>
-        <strong className="font-normal text-2xl">
-          <small className="text-gray-500 text-xs">LAT. </small>
-          <span className="tabular-nums">{coordinates?.latitude}</span>, &nbsp;
-          <small className="text-gray-500 text-xs">LONG. </small>
-          <span className="tabular-nums">{coordinates?.longitude}</span>
-        </strong>
+      {!coordinates ? (
+        <>"Loading..."</>
+      ) : (
+        <>
+          <section className="container flex flex-col justify-center flex-1 p-4 mx-auto text-center">
+            <h2 className="mb-4 text-lg text-gray-500 font-brand">
+              THE ISS IS CURRENTLY AT
+            </h2>
+            <strong className="text-2xl font-normal">
+              <small className="text-xs text-gray-500">LAT. </small>
+              <span className="tabular-nums">{coordinates?.latitude}</span>,
+              &nbsp;
+              <small className="text-xs text-gray-500">LONG. </small>
+              <span className="tabular-nums">{coordinates?.longitude}</span>
+            </strong>
 
-        <button
-          onClick={handleRefresh}
-          className="w-3/4 relative mt-6 mx-auto bg-yellow-400 px-4 py-3 font-brand"
-        >
-          <span className="tabular-nums absolute left-4 text-gray-500">
-            {refreshIn < 10 ? "0" + refreshIn : refreshIn}s
-          </span>
-          <span>{loading ? "REFRESHING..." : "REFRESH NOW !"} </span>
-        </button>
-      </section>
+            <button
+              onClick={handleRefresh}
+              className="relative w-3/4 px-4 py-3 mx-auto mt-6 bg-yellow-400 font-brand"
+            >
+              <span className="absolute text-gray-500 tabular-nums left-4">
+                {refreshIn < 10 ? "0" + refreshIn : refreshIn}s
+              </span>
+              <span>{loading ? "REFRESHING..." : "REFRESH NOW !"} </span>
+            </button>
+          </section>
 
-      <div className="m-4 border-2 border-yellow-400 mt-auto bg-white">
-        <MapContainer
-          center={[coordinates.latitude, coordinates.longitude]}
-          zoom={2}
-          scrollWheelZoom={false}
-          className="h-64"
-          whenCreated={setMap}
-        >
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <CircleMarker
-            center={[coordinates.latitude, coordinates.longitude]}
-            pathOptions={{ color: "#FBBF24" }}
-            radius={20}
-          >
-            <Tooltip>Tooltip for CircleMarker</Tooltip>
-          </CircleMarker>
-        </MapContainer>
-      </div>
+          <div className="m-4 mt-auto bg-white border-2 border-yellow-400">
+            <MapContainer
+              center={[coordinates.latitude, coordinates.longitude]}
+              zoom={2}
+              scrollWheelZoom={false}
+              className="h-64"
+              whenCreated={setMap}
+            >
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              <CircleMarker
+                center={[coordinates.latitude, coordinates.longitude]}
+                pathOptions={{ color: "#FBBF24" }}
+                radius={20}
+              >
+                <Tooltip>Tooltip for CircleMarker</Tooltip>
+              </CircleMarker>
+            </MapContainer>
+          </div>
+        </>
+      )}
     </div>
   );
 }
