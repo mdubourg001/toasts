@@ -1,0 +1,17 @@
+{
+  "name": "ISS Tracker",
+  "short_name": "ISSTracker",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#1f2937",
+  "theme_color": "#fbbf24",
+  "description": "Track the ISS position in real time.",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "type": "image/png",
+      "sizes": "400x400"
+    }
+  ]
+}
