@@ -1,48 +1,40 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+
+import { getCurrentTimestamp } from "../utils";
 
 export default function useISSCoordinates(refreshInterval) {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
-  const [fetchInterval, setFetchInterval] = useState(null);
+  const fetchInterval = useRef(null);
 
   const fetchISSCoordinates = useCallback(() => {
     setLoading(true);
 
     return fetch(`http://api.open-notify.org/iss-now.json`)
       .then((response) => response.json())
-      .then((data) => {
+      .then((coordinates) => {
         setLoading(false);
-        return data;
+
+        clearInterval(fetchInterval.current);
+        fetchInterval.current = setInterval(fetchAndSet, refreshInterval);
+
+        return coordinates;
       });
-  }, []);
-
-  const activateInterval = useCallback(() => {
-    const interval = setInterval(fetchAndSet, refreshInterval);
-    setFetchInterval(interval);
-
-    return interval;
-  }, [refreshInterval]);
+  }, [fetchInterval]);
 
   const fetchAndSet = useCallback(
-    (force = false) => {
-      if (force) {
-        clearInterval(fetchInterval);
-        activateInterval();
-      }
-
-      fetchISSCoordinates().then(setData);
-    },
-    [fetchInterval]
+    () => fetchISSCoordinates().then(setData),
+    []
   );
 
   useEffect(() => {
     fetchAndSet();
-    const interval = activateInterval();
 
-    () => clearInterval(interval);
+    () => clearInterval(fetchInterval.current);
   }, []);
 
   return {
+    timestamp: data?.timestamp ?? getCurrentTimestamp(),
     coordinates: data?.iss_position
       ? {
           latitude: Number.parseFloat(data?.iss_position.latitude),
@@ -50,6 +42,6 @@ export default function useISSCoordinates(refreshInterval) {
         }
       : undefined,
     loading,
-    refresh: () => fetchAndSet(true),
+    refresh: () => fetchAndSet(),
   };
 }

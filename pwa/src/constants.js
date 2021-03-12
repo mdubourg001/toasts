@@ -1,1 +1,2 @@
 export const REFRESH_INTERVAL = 10000;
+export const BORDEAUX_COORDINATES = [48.864716, 2.349014];
