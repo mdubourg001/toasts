@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -10,30 +10,18 @@ import { REFRESH_INTERVAL, BORDEAUX_COORDINATES } from "./constants";
 import { isOld, getFormattedTime } from "./utils";
 
 export default function App() {
-  const [refreshIn, setRefreshIn] = useState(REFRESH_INTERVAL / 1000);
   const [map, setMap] = useState(null);
-  const { timestamp, coordinates, loading, refresh } = useISSCoordinates(
-    REFRESH_INTERVAL
-  );
+  const {
+    timestamp,
+    coordinates,
+    loading,
+    refreshIn,
+    refresh,
+  } = useISSCoordinates(REFRESH_INTERVAL);
 
   const isDataOld = isOld(timestamp);
 
-  const handleRefresh = useCallback(() => {
-    refresh();
-    setRefreshIn(REFRESH_INTERVAL / 1000);
-  }, [refresh]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (refreshIn > 1) {
-        setRefreshIn(refreshIn - 1);
-      } else {
-        setRefreshIn(REFRESH_INTERVAL / 1000);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [refreshIn]);
+  console.log(isDataOld, timestamp);
 
   useEffect(() => {
     if (map && coordinates) {
@@ -62,7 +50,7 @@ export default function App() {
 
         <button
           disabled={isDataOld}
-          onClick={handleRefresh}
+          onClick={refresh}
           className={`relative w-3/4 px-4 py-3 mx-auto mt-6 bg-${
             isDataOld ? "gray-300" : "yellow-400"
           } font-brand`}

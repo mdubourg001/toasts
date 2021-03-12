@@ -81,7 +81,7 @@ self.addEventListener("fetch", (event) => {
             return fetch(event.request.url).then((response) => {
               if (response.ok && !NOT_TO_CACHE.includes(event.request.url)) {
                 console.log(`Caching ${event.request.url}...`);
-                //cache.put(event.request, response.clone());
+                cache.put(event.request, response.clone());
               }
 
               return response;
