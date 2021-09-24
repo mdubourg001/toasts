@@ -1,0 +1,21 @@
+{
+  "name": "event-loop",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "prebuild": "mkdir -p build && cp src/index.html build",
+    "build": "esbuild src/index.ts --bundle --outfile=build/index.js",
+    "dev": "concurrently \"yarn build --watch\" \"yarn serve\"",
+    "serve": "hrs build"
+  },
+  "dependencies": {
+    "concurrently": "^6.2.1",
+    "esbuild": "^0.13.2",
+    "esprima": "^4.0.1",
+    "simple-hot-reload-server": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/esprima": "^4.0.3"
+  }
+}

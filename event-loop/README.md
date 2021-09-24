@@ -20,10 +20,9 @@
 - Le rendu étant effectué sur le même thread, celui-ci ne peux pas être fait tant qu'il reste des tâches en cours sur la callstack (peu importe la durée des tâches en question)
 - Pour simplifier, on peut dire que ces opérations de rendu sont elles aussi placées en attente sur la callback queue de manière périodique, mais avec une priorité trés élevée : en première place de la queue
 - _Schéma avec les rendus placés dans la callback queue_
-- La callback queue ne peux donc pas bloquer le rendu, seul la callstack le peut
 - Certaines Web APIs permettent de prioriser ou dé-prioriser certaines tâches par rapport au rendu : `requestAnimationFrame` qui demande au navigateur de prioriser une tâche avant le prochain rendu, et `requestIdleCallback` qui indique au navigateur qu'un tâche doit être éxécuté en basse priorité cad. après le rendu et seulement si il reste du temps avant la frame suivante
 - En synthèse, à chaque frame (~60 fois par seconde), le navigateur :
   - Éxécute les tâches en attente sur la callstack
   - Demande à la callback queue de placer les tâches en attente sur la callback queue sur la callstack, en respectant un certain ordre de priorité (celà inclu le rendu)
 - _Exemples et schémas complets avec `requestAnimationFrame` et `requestIdleCallback`_
-- Le fonctionnement décrit est très simplifie ici : les navigateurs réalisent en réalité énormément de micro-optimisation lors de ce processus
+- Le fonctionnement décrit est très simplifie ici : les navigateurs réalisent en réalité énormément de micro-optimisations lors de ce processus
