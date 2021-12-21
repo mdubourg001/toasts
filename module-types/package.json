@@ -1,0 +1,13 @@
+{
+  "name": "module-types",
+  "version": "1.0.0",
+  "main": "dist/module.cjs.js",
+  "module": "dist/module.esm.js",
+  "license": "MIT",
+  "devDependencies": {
+    "rollup": "^2.61.1"
+  },
+  "scripts": {
+    "build": "rollup -c"
+  }
+}
