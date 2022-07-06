@@ -40,7 +40,7 @@ drawings:
 
 Défini par la hiérarchie du dossier `app/routes`
 
-```text {2|3-9|all}
+```text {all|2|3-9|all}
 📂 app
   ├── root.tsx
   └── 📂 routes
@@ -130,12 +130,12 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 export const loader = async () => {
-  const data = await getDataSomehow();
+  const tasks = await getTasksSomehow();
 
-  // return new Response(JSON.stringify(data), {
+  // return new Response(JSON.stringify(tasks), {
   //   headers: { "Content-Type": "application/json" } 
   // })
-  return json(data);
+  return json(tasks);
 };
 
 export default function TasksList() {
@@ -159,11 +159,11 @@ export default function TasksList() {
 export async function getStaticProps () {}
 
 export async function getServerSideProps () {
-  const data = await getDataSomehow();
+  const tasks = await getTasksSomehow();
 
   return {
     props: {
-      tasks: data
+      tasks: tasks
     }
   };
 }
@@ -189,12 +189,12 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 export const loader = async () => {
-  const data = await getDataSomehow();
+  const tasks = await getTasksSomehow();
 
-  // return new Response(JSON.stringify(data), {
+  // return new Response(JSON.stringify(tasks), {
   //   headers: { "Content-Type": "application/json" } 
   // })
-  return json(data);
+  return json(tasks);
 };
 
 export default function TasksList() {
@@ -223,9 +223,6 @@ export default function TasksList() {
 </v-clicks>
 
 ---
-layout: two-cols
-class: first-of-type:mr-8
----
 
 # Mutations
 
@@ -248,7 +245,7 @@ export const action = async ({ request }) => {
 
 export default function TasksCreation() {
   return (
-    <form method="post" action="/tasks/create">
+    <form method="post">
       <label htmlFor="title">Title</label>
       <input id="title" name="title" type="text" />
       <button type="submit">Create task</button>
@@ -259,7 +256,7 @@ export default function TasksCreation() {
 
 ::right::
 
-<br />
+<!-- <br />
 <br />
 <br />
 
@@ -268,8 +265,9 @@ export default function TasksCreation() {
 ```tsx {0|all}
 // src/pages/api/tasks/create.ts
 export default function handler(request, response) {
-  const form = JSON.parse(request.body);
+  const form = request.body;
   const task = await saveTaskToDB(form);
+
   return response.redirect(`/tasks/${task.id}`);
 }
 
@@ -278,25 +276,16 @@ export default function handler(request, response) {
 ```tsx {0|all}
 // src/pages/tasks/create.tsx
 export default function TasksCreation() {
-  const [form, dispatch] = useReducer(formReducer);
-  const submitForm = useCallback((e) => {
-    fetch("/api/tasks/create", {
-      method: "POST", 
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form);
-    })
-  }, [form])
-
   return (
-    <form onSubmit={submitForm}>{/* ... */}</form>
+    <form method="post" method="/api/tasks/create">
+      <label htmlFor="title">Title</label>
+      <input id="title" name="title" type="text" />
+      <button type="submit">Create task</button>
+    </form>
   )
 }
-```
+``` -->
 
-
----
-layout: two-cols
-class: first-of-type:mr-8
 ---
 
 # Mutations <span class="text-gray-400">- Validation</span>
@@ -327,20 +316,80 @@ export default function TasksCreation() {
   return <form method="post">{/* ... */}</form>
 }
 ```
+---
+
+# Mutations <span class="text-gray-400">- Optimistic UI (nécessite JS)</span>
+
+##### Remix
+
+```tsx {1-2|1-2,8-9,16|1-2,8-16}
+// app/routes/tasks/create.tsx
+import { useTransition } from "@remix-run/react";
+
+export const action = async ({ request }) => {
+  // ...
+};
+
+export default function TasksCreation() {
+  const transition = useTransition();
+
+  if (transition.state === "submitting") {
+    return <TaskView task={transition.submission.formData}>
+  } else {
+    return <form method="post">{...}</form>
+  }
+}
+```
+
+--- 
+layout: two-cols
+class: first-of-type:mr-8
+---
+
+# Mutations
+
+<v-clicks>
+
+- Comme `loader`, peut exister au niveau de chaque Route : `loader` traite les requêtes GET et `action` les requêtes POST
+- Comme `loader`, retourne un objet `Response` standard
+- Facilite l'optimistic UI et l'error handling
+- Permet la revalidation automatique de la donnée de la route concernée
+
+</v-clicks>
 
 ::right::
 
 <br />
 <br />
 <br />
-<br />
 
-<v-clicks>
+```tsx
+// app/routes/tasks/create.tsx
+import { redirect } from "@remix-run/node"
+import { useActionData, useTransition } from "@remix-run/react"
 
-- Comme `loader`, peut exister au niveau de chaque Route : `loader` traite les requêtes GET et `action` les requêtes POST
-- Comme `loader`, retourne un objet `Response` standard
+export const action = async ({ request }) => {
+  const formData = await request.formData();
+  const [error, task] = await saveTaskToDB(formData);
 
-</v-clicks>
+  if (error) {
+    return json({ error });
+  }
+  return redirect(`/tasks/${task.id}`);
+};
+
+export default function TasksCreation() {
+  const actionData = useActionData()
+  const transition = useTransition();
+  return (
+    <form method="post">
+      <label htmlFor="title">Title</label>
+      <input id="title" name="title" type="text" />
+      <button type="submit">Create task</button>
+    </form>
+  )
+}
+```
 
 ---
 layout: two-cols
@@ -351,7 +400,6 @@ class: first-of-type:mr-8
 
 ```tsx {0|1,3-13|1-22}
 // app/routes/tasks/index.tsx
-import { useCatch } from "@remix-run/react";
 
 export function ErrorBoundary({ error }) {
   return (
@@ -364,13 +412,11 @@ export function ErrorBoundary({ error }) {
   );
 }
 
-export const loader = () => { throw new Response() }
-export function CatchBoundary() {
-  const caught = useCatch();
-
-  return (
-      <p>Status code: {caught.status}</p>
-  );
+export const loader = () => { 
+  throw "🚨" 
+}
+export const action = () => { 
+  throw "🚨" 
 }
 
 export default function TasksList() { /* ... */ }
@@ -385,12 +431,10 @@ export default function TasksList() { /* ... */ }
 
 <v-clicks>
 
-- Comme `loader` et `action`, peuvent exister au niveau de chaque Route
-- Interceptent toutes les erreurs qui sont throw pendant le rendu (client ou serveur), au sein d'un loader, ou au sein d'une action
-- `CatchBoundary`, si définit, interceptera toutes les erreurs issues du loader ou de l'action
-- `ErrorBoundary` interceptera toutes les autres
+- `ErrorBoundary` interceptera toutes les erreurs issues du `loader`, de l'`action`, ou du rendu (serveur ou client)
+- Comme `loader` et `action`, peut exister au niveau de chaque Route
 - Si une Route ne définit pas d'`ErrorBoundary`, c'est l`ErrorBoundary` de la Route parente qui l'interceptera
-- (_Sera aussi possible sur NextJS avec les Layouts_) 
+- (_Sera aussi possible sur NextJS avec les Layouts_)
 
 </v-clicks>
 
@@ -410,7 +454,7 @@ layout: center
 
 <v-click>
 
-Tous les exemples de code Remix présentés jusqu'ici fonctionnent sans JavaScript.
+Tous les exemples de code Remix présentés jusqu'ici fonctionnent sans JavaScript côté client.
 
 </v-click>
 <v-click>
