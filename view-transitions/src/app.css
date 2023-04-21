@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+}
+
+body {
+  @apply min-h-screen bg-gradient-to-b from-gray-700 via-gray-800 to-gray-900;
+}
