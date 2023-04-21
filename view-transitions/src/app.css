@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+  view-transition-name: none;
 }
 
 ::view-transition-old(root),

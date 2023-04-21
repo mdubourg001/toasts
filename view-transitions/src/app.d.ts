@@ -11,6 +11,12 @@ declare global {
   interface Document {
     startViewTransition: (Function) => void;
   }
+
+  interface Element {
+    style: {
+      viewTransitionName: string;
+    };
+  }
 }
 
 export {};

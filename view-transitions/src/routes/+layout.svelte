@@ -6,7 +6,7 @@
 </script>
 
 <div>
-  <header class="container py-6 mx-auto">
+  <header class="container py-6 mx-auto max-w-[1000px]">
     <h1
       class="text-4xl font-extrabold text-white hover:scale-[1.005] transition-transform"
     >

@@ -1,8 +1,18 @@
 <script lang="ts">
+  import Image from "../components/Image.svelte";
   import { spaNavigate } from "../helpers/navigate";
   import type { PageData } from "./$types";
 
   export let data: PageData;
+
+  function handleImageClick(event: MouseEvent, imageId: string) {
+    if (event.target) {
+      (event.target as HTMLImageElement).style.viewTransitionName =
+        "emphasized";
+    }
+
+    spaNavigate(`/${imageId}`);
+  }
 </script>
 
 <div
@@ -10,8 +20,13 @@
 >
   {#each data.images as image}
     <!-- Don't blame me, it's currently not possible using native Svelte navigation 🫣 -->
-    <a class="cursor-pointer" on:click={() => spaNavigate(`/${image.id}`)}>
-      <img src={image.image_paths[0]} alt="" class="rounded-md shadow-lg" />
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-missing-attribute -->
+    <a
+      class="cursor-pointer"
+      on:click={(event) => handleImageClick(event, image.id)}
+    >
+      <Image {image} />
     </a>
   {/each}
 </div>
