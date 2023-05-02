@@ -8,6 +8,10 @@ declare global {
     // interface Platform {}
   }
 
+  interface Window {
+    __seed?: number;
+  }
+
   interface Document {
     startViewTransition: (Function) => void;
   }

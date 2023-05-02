@@ -6,7 +6,7 @@ export function spaNavigate(to: string) {
     return;
   }
 
-  return document.startViewTransition(() => {
-    return goto(to);
-  });
+  // return document.startViewTransition(() => {
+  return goto(to);
+  // });
 }

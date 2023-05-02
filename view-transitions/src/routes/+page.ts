@@ -1,13 +1,34 @@
 import { getImages } from "../api/getImages";
 
+function shuffle(array: any[], seed: number) {
+  let currentIndex = array.length,
+    temporaryValue,
+    randomIndex;
+  seed = seed || 1;
+  let random = function () {
+    var x = Math.sin(seed++) * 10000;
+    return x - Math.floor(x);
+  };
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+    // Pick a remaining element...
+    randomIndex = Math.floor(random() * currentIndex);
+    currentIndex -= 1;
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+  return array;
+}
+
 export const load = async () => {
   const images = await getImages();
-  const shuffled = [...images].slice(0, 20);
+  const seed = Math.floor(Math.random() * 1000);
 
-  // for (let i = shuffled.length - 1; i > 0; i--) {
-  //   const j = Math.floor(Math.random() * (i + 1));
-  //   [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  // }
+  if (!window.__seed) {
+    window.__seed = seed;
+  }
 
-  return { images: shuffled };
+  return { images: shuffle(images, window.__seed) };
 };

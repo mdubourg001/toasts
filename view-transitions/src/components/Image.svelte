@@ -5,9 +5,9 @@
   let element: HTMLImageElement;
   export let image: Awaited<ReturnType<typeof getImage>>;
 
-  onMount(() => {
-    element.style.viewTransitionName = image?.id as string;
-  });
+  // onMount(() => {
+  //   element.style.viewTransitionName = image?.id as string;
+  // });
 </script>
 
 <img

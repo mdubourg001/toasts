@@ -5,13 +5,20 @@
   export let data: PageData;
 </script>
 
+<header class="container py-6 mx-auto max-w-[1000px]">
+  <h1 class="flex justify-center text-4xl font-extrabold text-white">
+    <a on:click={() => spaNavigate(`/`)} class="cursor-pointer"
+      >Midjourney <span class="font-extralight">Showcase</span></a
+    >
+  </h1>
+</header>
+
 <div
   class="container flex flex-col items-start py-10 mx-auto gap-y-4 max-w-[1000px]"
 >
   <button
     on:click={() => spaNavigate(`/`)}
-    class="text-xl text-white hover:scale-[1.02] transition-transform text-gray-300"
-    >← Back to showcase</button
+    class="text-xl text-white text-gray-300">← Back to showcase</button
   >
 
   <div class="grid grid-cols-5 gap-x-10">
@@ -25,8 +32,12 @@
 </div>
 
 <style>
-  #emphasized {
+  /* #emphasized {
     view-transition-name: emphasized;
     contain: layout;
-  }
+  } */
+
+  /* h1 {
+    view-transition-name: title;
+  } */
 </style>
